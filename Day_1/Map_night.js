@@ -37,7 +37,7 @@
                 case "NaturalEarth1": return d3.geoNaturalEarth1();
                 case "Mercator": return d3.geoMercator();
                 case "Orthographic": return d3.geoOrthographic();
-                case "ConicEqualArea": return d3.geoConicEqualArea(); // Esta necesita configuración, la simplificamos
+                case "ConicEqualArea": return d3.geoConicEqualArea(); 
                 default: return d3.geoNaturalEarth1();
             }
         }
@@ -49,7 +49,6 @@
             
             path = d3.geoPath(projection, context);
 
-            // Intentamos ajustar la proyección. La proyección ortográfica es un caso especial
             if (projection.center) { // La mayoría de las proyecciones tienen un centro
                  if (projection.rotate) { // Para geoOrthographic
                     // Mueve el centro de la proyección para seguir la posición del sol
@@ -62,14 +61,13 @@
                 projection.fitWidth(width, sphere);
             }
 
-            // Calculamos la altura resultante para que no se deforme
+            // Calculamr la altura resultante para que no se deforme
             const [[x0, y0], [x1, y1]] = d3.geoPath(projection).bounds(sphere);
             const height = Math.ceil(y1 - y0);
             
             canvas.width = width;
             canvas.height = height;
 
-            // Centramos la proyección (necesario después de ajustar el tamaño)
             if (!projection.rotate) { // No centramos si la proyección se rota (orthographic)
                  projection.translate([width / 2, height / 2]);
             }
