@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Mapa Interactivo Día/Noche ¿Cuándo es de noche en el mundo? </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/solar-calculator@0.3/dist/solar-calculator.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+
+</head>
+<body>
+
+    <h1>Mapa Interactivo Día/Noche ¿Cuándo es de noche en el mundo?</h1>
+
+    <div id="controls">
+        <button id="updateButton">Actualizar Ahora</button>
+        <span id="currentTime"></span>
+        <label for="projectionSelector" style="color: #333; margin-left: 10px;">Proyección:</label>
+        <select id="projectionSelector">
+            <option value="NaturalEarth1">Natural Earth</option>
+            <option value="Mercator">Mercator</option>
+            <option value="Orthographic">Ortográfica</option>
+            <option value="ConicEqualArea">Cónica Equivalente</option>
+        </select>
+    </div>
+
+    <div id="map-container">
+        <canvas id="mapCanvas"></canvas>
+    </div>
+
+    <script src="Map_night.js"></script>
+
+</body>
+</html>
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>#30DayMapChallenge 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-weight: 300;
+            text-align: center;
+            color: #007aff;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        a {
+            display: block;
+            padding: 15px 20px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #007aff;
+            font-weight: 500;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        a:hover {
+            background-color: #e9eff5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .day-title {
+            font-size: 1.2em;
+        }
+        .day-desc {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+        /* Estilo para días futuros (deshabilitados) */
+        .disabled {
+            background-color: #fdfdfd;
+            color: #aaa;
+            pointer-events: none;
+        }
+        .disabled .day-desc {
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Mi #30DayMapChallenge 2025</h1>
+        <ul>
+            <li>
+                <a href="./day1/">
+                    <div class="day-title">Día 1: Puntos</div>
+                    <div class="day-desc">Un mapa interactivo de día y noche con D3.js.</div>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="disabled">
+                    <div class="day-title">Día 2: Líneas</div>
+                    <div class="day-desc">Próximamente...</div>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="disabled">
+                    <div class="day-title">Día 3: Polígonos</div>
+                    <div class="day-desc">Próximamente...</div>
+                </a>
+            </li>
+            <!-- Añade más días aquí -->
+        </ul>
+    </div>
+
+</body>
+</html>
+

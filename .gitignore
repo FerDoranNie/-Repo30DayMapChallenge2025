@@ -1,0 +1,12 @@
+# Ignorar la carpeta Data
+Data/
+# Ignorar archivos con extensiones específicas
+*.tiff
+*.csv
+*.shp
+*.geojson
+*.zip
+*.rar
+*.Rhistory
+__pycache__/
+.pyc

@@ -1,0 +1,65 @@
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-weight: 300;
+        }
+        #map-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 10px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden; 
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            background-color: #a0c8f0; /* Color de océano azul claro */
+        }
+        #controls {
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 15px;
+        }
+        #controls button, #controls select {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            appearance: none; /* Quita el estilo por defecto de select */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5%200-9.3%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.7c0%204.6%201.8%208.9%205.4%2012.8L139.8%20227.3c3.9%203.8%208.2%205.7%2012.8%205.7s8.9-1.9%2012.8-5.7L287%2095.5c3.5-3.8%205.4-8.1%205.4-12.8%200-4.6-1.8-8.9-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E"); /* Flecha de select custom */
+            background-repeat: no-repeat;
+            background-position: right 0.7em top 50%, 0 0;
+            background-size: 0.65em auto, 100%;
+            padding-right: 2.5em;
+        }
+        #controls button:hover, #controls select:hover {
+            background-color: #0056b3;
+        }
+        #currentTime {
+            font-family: monospace;
+            font-size: 1.1em;
+        }
