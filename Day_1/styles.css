@@ -63,3 +63,21 @@
             font-family: monospace;
             font-size: 1.1em;
         }
+
+        /* --- Media Query para Responsividad en Celulares --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px; 
+            }
+
+            h1 {
+                font-size: 1.5em; 
+                text-align: center;
+            }
+
+            #controls {
+                flex-direction: column; /* Apila los controles verticalmente */
+                gap: 10px; /* Reduce el espacio entre elementos */
+                padding: 10px;
+            }
+        }
