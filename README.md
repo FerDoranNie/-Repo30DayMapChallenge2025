@@ -3,6 +3,9 @@ Este es mi repositorio donde guardaré los códigos para hacer los mapas para el
 
 Autor: Fernando Dorantes Nieto
 
+Los mapas y demás se podrán ver en esta página web:
+[FerDoranNie 30 Day Map Challenge 2025](https://ferdorannie.github.io/-Repo30DayMapChallenge2025/)
+
 ## Día 1:
 ### Mapa del día y noche en tiempo real
 #### Software utilizado:
