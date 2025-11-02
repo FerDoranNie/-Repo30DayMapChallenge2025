@@ -11,6 +11,10 @@
         let projection = d3.geoNaturalEarth1(); // La proyección inicial
         let path = d3.geoPath(projection, context); // El path se actualizará con la proyección
 
+        // --- Variables para el control de zoom y arrastre ---
+        let currentScale;
+        let currentRotate;
+
         // --- LÓGICA DEL TERMINADOR (DÍA/NOCHE) ---
 
         const antipode = ([longitude, latitude]) => [longitude + 180, -latitude];
@@ -126,6 +130,38 @@
             try {
                 const world = await d3.json(worldUrl);
                 const land = topojson.feature(world, world.objects.land);
+
+                // --- Lógica de Zoom y Arrastre ---
+                const zoom = d3.zoom()
+                    .scaleExtent([0.8, 10]) // Límites de zoom (escala mínima y máxima)
+                    .on('start', () => {
+                        // Guardamos la rotación y escala inicial al empezar el gesto
+                        currentRotate = projection.rotate();
+                        currentScale = projection.scale();
+                    })
+                    .on('zoom', (event) => {
+                        const { transform } = event;
+                        const isOrthographic = projectionSelector.value === "Orthographic";
+
+                        // No permitir arrastre en la vista ortográfica para no interferir con la rotación automática
+                        if (!isOrthographic) {
+                            const r = projection.invert([transform.x, transform.y]);
+                            if (r) {
+                                projection.rotate([
+                                    currentRotate[0] + (r[0] - projection.invert([0,0])[0]),
+                                    currentRotate[1] + (r[1] - projection.invert([0,0])[1])
+                                ]);
+                            }
+                        }
+
+                        projection.scale(currentScale * transform.k);
+                        
+                        drawMap(land);
+                    })
+                    .on('end', () => {
+                    });
+
+                d3.select(canvas).call(zoom);
 
                 const redraw = () => drawMap(land);
 
