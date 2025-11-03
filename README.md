@@ -17,3 +17,16 @@ de un trabajo de Mike Bostock: [Mapa Dia noche Bostock](https://observablehq.com
 
 ![Dia 1](images/Mapa_dia_1.png)
 
+
+
+## Día 2:
+### Siembra de maiz por municipio en México
+#### Software utilizado:
+- Python
+- Tableau
+
+#### Origen de los datos 
+[Datos Inegi](https://gaia.inegi.org.mx/)
+
+![Dia 2](images/Mapa_dia_2.png)
+[Link a Tableau Public](https://public.tableau.com/views/Mapa_maiz_mexico/SiembradeMaizMexico?:language=en-US&publish=yes&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)

@@ -10,3 +10,6 @@ Data/
 *.Rhistory
 __pycache__/
 .pyc
+.twbx
+.twb
+.twbr

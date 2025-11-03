@@ -1,0 +1,2187 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20252.25.1003.1601                               -->
+<workbook original-version='18.1' source-build='2025.2.4 (20252.25.1003.1601)' source-platform='win' version='18.1' xml:base='https://public.tableau.com' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AccessibleZoneTabOrder />
+    <AnimationOnByDefault />
+    <AutoCreateAndUpdateDSDPhoneLayouts />
+    <MapboxVectorStylesAndLayers />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelExtractV2 />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SetMembershipControl />
+    <SheetIdentifierTracking />
+    <SpatialFileLayer />
+    <_.fcp.VConnDownstreamExtractsWithWarnings.true...VConnDownstreamExtractsWithWarnings />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <repository-location id='Mapa_maiz_mexico' path='/workbooks' revision='1.0' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='INEGI Maiz Data' inline='true' name='federated.07wqxzq0kq4dq60zs2srb073ushf' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Inegi_maiz_data' name='textscan.1kumi4y0hvchbg15qrzd507z0amu'>
+            <connection class='textscan' directory='C:/Users/fernando.dorantes/local/Git_repositories/Repo30DayMapChallenge2025/Data' filename='Inegi_maiz_data.csv' password='' server='' workgroup-auth-mode='as-is' />
+          </named-connection>
+          <named-connection caption='mun23cw' name='ogrdirect.1jj7hg70ldc4io1abr6yn0tqip46'>
+            <connection class='ogrdirect' directory='C:/Users/fernando.dorantes/local/Git_repositories/Repo30DayMapChallenge2025/Data/mun23gw_c' filename='mun23cw.shp' password='' server='' tablename='' workgroup-auth-mode='as-is' />
+          </named-connection>
+        </named-connections>
+        <relation join='right' type='join'>
+          <clause type='join'>
+            <expression op='AND'>
+              <expression op='='>
+                <expression op='[Inegi_maiz_data.csv].[clave]' />
+                <expression op='INT([mun23cw.shp].[CVEGEO])' />
+              </expression>
+              <expression op='='>
+                <expression op='[Inegi_maiz_data.csv].[entidad]' />
+                <expression op='[mun23cw.shp].[NOM_ENT]' />
+              </expression>
+            </expression>
+          </clause>
+          <relation connection='textscan.1kumi4y0hvchbg15qrzd507z0amu' name='Inegi_maiz_data.csv' table='[Inegi_maiz_data#csv]' type='table'>
+            <columns character-set='UTF-8' header='yes' locale='es_MX' separator=','>
+              <column datatype='integer' name='clave' ordinal='0' />
+              <column datatype='string' name='entidad' ordinal='1' />
+              <column datatype='string' name='municipio' ordinal='2' />
+              <column datatype='real' name='maiz_forrajero' ordinal='3' />
+              <column datatype='real' name='maiz_amarillo' ordinal='4' />
+              <column datatype='real' name='maiz_blanco' ordinal='5' />
+            </columns>
+          </relation>
+          <relation connection='ogrdirect.1jj7hg70ldc4io1abr6yn0tqip46' name='mun23cw.shp' table='[mun23cw.shp]' type='table'>
+            <columns>
+              <column datatype='string' name='CVEGEO' ordinal='0' />
+              <column datatype='string' name='CVE_ENT' ordinal='1' />
+              <column datatype='string' name='CVE_MUN' ordinal='2' />
+              <column datatype='string' name='NOMGEO' ordinal='3' />
+              <column datatype='string' name='NOM_ENT' ordinal='4' />
+              <column datatype='integer' name='COV_' ordinal='5' />
+              <column datatype='integer' name='COV_ID' ordinal='6' />
+              <column datatype='real' name='AREA' ordinal='7' />
+              <column datatype='real' name='PERIMETER' ordinal='8' />
+              <column datatype='spatial' name='Geometry' ordinal='9' />
+            </columns>
+          </relation>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;es&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;es_MX&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>clave</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[clave]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>clave</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>entidad</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[entidad]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>entidad</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LES_RES' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>municipio</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[municipio]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>municipio</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LES_RES' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>maiz_forrajero</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[maiz_forrajero]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>maiz_forrajero</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>maiz_amarillo</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[maiz_amarillo]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>maiz_amarillo</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>maiz_blanco</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[maiz_blanco]</local-name>
+            <parent-name>[Inegi_maiz_data.csv]</parent-name>
+            <remote-alias>maiz_blanco</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CVEGEO</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[CVEGEO]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>CVEGEO</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CVE_ENT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[CVE_ENT]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>CVE_ENT</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>CVE_MUN</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[CVE_MUN]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>CVE_MUN</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>NOMGEO</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[NOMGEO]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>NOMGEO</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>NOM_ENT</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[NOM_ENT]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>NOM_ENT</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='binary' />
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COV_</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COV_]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>COV_</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COV_ID</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COV_ID]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>COV_ID</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>AREA</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[AREA]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>AREA</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>PERIMETER</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[PERIMETER]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>PERIMETER</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Geometry</remote-name>
+            <remote-type>8</remote-type>
+            <local-name>[Geometry]</local-name>
+            <parent-name>[mun23cw.shp]</parent-name>
+            <remote-alias>Geometry</remote-alias>
+            <ordinal>15</ordinal>
+            <caption>Geometría</caption>
+            <local-type>spatial</local-type>
+            <aggregation>Collect</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Area' datatype='real' name='[AREA]' role='measure' type='quantitative' />
+      <column caption='Cov Id' datatype='integer' name='[COV_ID]' role='dimension' type='ordinal' />
+      <column caption='Cov' datatype='integer' name='[COV_]' role='measure' type='quantitative' />
+      <column caption='Cvegeo' datatype='string' name='[CVEGEO]' role='dimension' type='nominal' />
+      <column caption='Cve Ent' datatype='string' name='[CVE_ENT]' role='dimension' type='nominal' />
+      <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+      <column caption='Maiz Total' datatype='real' name='[Calculation_399975944098455554]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[maiz_amarillo] + [maiz_blanco] + [maiz_forrajero]' />
+      </column>
+      <column caption='Area km2' datatype='real' name='[Calculation_399975944098521091]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='AREA([Geometry], &apos;km&apos;)' />
+      </column>
+      <column caption='Area ha' datatype='real' name='[Calculation_399975944098590724]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[Calculation_399975944098521091]*100' />
+      </column>
+      <column caption='Porcentaje de sembrado' datatype='real' name='[Calculation_399975944098627589]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='[Calculation_399975944098455554]&#13;&#10;/[Calculation_399975944098590724]' />
+      </column>
+      <column caption='Categoría Sembrado' datatype='string' name='[Calculation_399975944099446790]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF &#13;&#10;    [Calculation_399975944098627589]&gt;0 AND [Calculation_399975944098627589]&lt;=0.2&#13;&#10;    THEN &apos;0-20%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.2 AND [Calculation_399975944098627589]&lt;=0.4&#13;&#10;    THEN &apos;20-40%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.4 AND [Calculation_399975944098627589]&lt;=0.6&#13;&#10;    THEN &apos;40-60%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.6 AND [Calculation_399975944098627589]&lt;=0.8&#13;&#10;    THEN &apos;60-80%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.8 AND [Calculation_399975944098627589]&lt;=1&#13;&#10;    THEN &apos;80-100%&apos;&#13;&#10;ELSE &apos;No hay datos&apos;&#13;&#10;END' />
+      </column>
+      <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+      <column caption='Nomgeo' datatype='string' name='[NOMGEO]' role='dimension' type='nominal' />
+      <column caption='Nom Ent' datatype='string' name='[NOM_ENT]' role='dimension' type='nominal' />
+      <column caption='Perimeter' datatype='real' name='[PERIMETER]' role='measure' type='quantitative' />
+      <column caption='Inegi_maiz_data.csv' datatype='table' name='[__tableau_internal_object_id__].[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]' role='measure' type='quantitative' />
+      <column caption='Clave' datatype='integer' name='[clave]' role='measure' type='quantitative' />
+      <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+      <column caption='Maiz Amarillo' datatype='real' name='[maiz_amarillo]' role='measure' type='quantitative' />
+      <column caption='Maiz Blanco' datatype='real' name='[maiz_blanco]' role='measure' type='quantitative' />
+      <column caption='Maiz Forrajero' datatype='real' name='[maiz_forrajero]' role='measure' type='quantitative' />
+      <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+      <column-instance column='[Calculation_399975944099446790]' derivation='None' name='[none:Calculation_399975944099446790:nk]' pivot='key' type='nominal' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='es_ES' class='hyper' dbname='C:/Users/FERNAN~1.DOR/AppData/Local/Temp/TableauTemp/#TableauTemp_09fwiiw1kmlwuu1aao5pf0cncq3c.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='11/03/2025 04:09:36 AM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>clave</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[clave]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>clave</remote-alias>
+              <ordinal>0</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2415</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>entidad</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[entidad]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>entidad</remote-alias>
+              <ordinal>1</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>34</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LES_RES' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>municipio</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[municipio]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>municipio</remote-alias>
+              <ordinal>2</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1742</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LES_RES' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>maiz_forrajero</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[maiz_forrajero]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>maiz_forrajero</remote-alias>
+              <ordinal>3</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1019</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>maiz_amarillo</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[maiz_amarillo]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>maiz_amarillo</remote-alias>
+              <ordinal>4</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1347</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>maiz_blanco</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[maiz_blanco]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>maiz_blanco</remote-alias>
+              <ordinal>5</ordinal>
+              <family>Inegi_maiz_data.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1946</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>CVEGEO</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[CVEGEO]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>CVEGEO</remote-alias>
+              <ordinal>6</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='binary' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>CVE_ENT</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[CVE_ENT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>CVE_ENT</remote-alias>
+              <ordinal>7</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>33</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='binary' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>CVE_MUN</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[CVE_MUN]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>CVE_MUN</remote-alias>
+              <ordinal>8</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>420</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='binary' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>NOMGEO</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[NOMGEO]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>NOMGEO</remote-alias>
+              <ordinal>9</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1749</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='binary' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>NOM_ENT</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[NOM_ENT]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>NOM_ENT</remote-alias>
+              <ordinal>10</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>33</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='binary' />
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>COV_</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[COV_]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>COV_</remote-alias>
+              <ordinal>11</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>COV_ID</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[COV_ID]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>COV_ID</remote-alias>
+              <ordinal>12</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>AREA</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[AREA]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>AREA</remote-alias>
+              <ordinal>13</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>PERIMETER</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[PERIMETER]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>PERIMETER</remote-alias>
+              <ordinal>14</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Geometry</remote-name>
+              <remote-type>128</remote-type>
+              <local-name>[Geometry]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Geometry</remote-alias>
+              <ordinal>15</ordinal>
+              <family>mun23cw.shp</family>
+              <local-type>spatial</local-type>
+              <aggregation>Collect</aggregation>
+              <approx-count>2475</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[none:Calculation_399975944099446790:nk]' palette='green_orange_cyan_yellow_10_0' type='palette'>
+            <map to='#006699'>
+              <bucket>&quot;40-60\%&quot;</bucket>
+            </map>
+            <map to='#4e9f50'>
+              <bucket>&quot;0-20\%&quot;</bucket>
+            </map>
+            <map to='#a08400'>
+              <bucket>&quot;20-40\%&quot;</bucket>
+            </map>
+            <map to='#d5d5d5'>
+              <bucket>&quot;No hay datos&quot;</bucket>
+            </map>
+            <map to='#f0e442'>
+              <bucket>&quot;80-100\%&quot;</bucket>
+            </map>
+            <map to='#f59b00'>
+              <bucket>&quot;60-80\%&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;Estados Unidos Mexicanos&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='Inegi_maiz_data.csv' id='Inegi_maiz_data.csv_6645733226984B98A0A8CFC168209414'>
+            <properties context=''>
+              <relation join='right' type='join'>
+                <clause type='join'>
+                  <expression op='AND'>
+                    <expression op='='>
+                      <expression op='[Inegi_maiz_data.csv].[clave]' />
+                      <expression op='INT([mun23cw.shp].[CVEGEO])' />
+                    </expression>
+                    <expression op='='>
+                      <expression op='[Inegi_maiz_data.csv].[entidad]' />
+                      <expression op='[mun23cw.shp].[NOM_ENT]' />
+                    </expression>
+                  </expression>
+                </clause>
+                <relation connection='textscan.1kumi4y0hvchbg15qrzd507z0amu' name='Inegi_maiz_data.csv' table='[Inegi_maiz_data#csv]' type='table'>
+                  <columns character-set='UTF-8' header='yes' locale='es_MX' separator=','>
+                    <column datatype='integer' name='clave' ordinal='0' />
+                    <column datatype='string' name='entidad' ordinal='1' />
+                    <column datatype='string' name='municipio' ordinal='2' />
+                    <column datatype='real' name='maiz_forrajero' ordinal='3' />
+                    <column datatype='real' name='maiz_amarillo' ordinal='4' />
+                    <column datatype='real' name='maiz_blanco' ordinal='5' />
+                  </columns>
+                </relation>
+                <relation connection='ogrdirect.1jj7hg70ldc4io1abr6yn0tqip46' name='mun23cw.shp' table='[mun23cw.shp]' type='table'>
+                  <columns>
+                    <column datatype='string' name='CVEGEO' ordinal='0' />
+                    <column datatype='string' name='CVE_ENT' ordinal='1' />
+                    <column datatype='string' name='CVE_MUN' ordinal='2' />
+                    <column datatype='string' name='NOMGEO' ordinal='3' />
+                    <column datatype='string' name='NOM_ENT' ordinal='4' />
+                    <column datatype='integer' name='COV_' ordinal='5' />
+                    <column datatype='integer' name='COV_ID' ordinal='6' />
+                    <column datatype='real' name='AREA' ordinal='7' />
+                    <column datatype='real' name='PERIMETER' ordinal='8' />
+                    <column datatype='spatial' name='Geometry' ordinal='9' />
+                  </columns>
+                </relation>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+  </datasources>
+  <mapsources>
+    <mapsource name='Tableau' />
+  </mapsources>
+  <worksheets>
+    <worksheet name='Maiz Amarillo'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold='true' fontalignment='1'>Maiz Amarillo (Hectáreas)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='INEGI Maiz Data' name='federated.07wqxzq0kq4dq60zs2srb073ushf' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='federated.07wqxzq0kq4dq60zs2srb073ushf'>
+            <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+            <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+            <column-instance column='[Geometry]' derivation='Collect' name='[clct:Geometry:nk]' pivot='key' type='nominal' />
+            <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+            <column caption='Maiz Amarillo' datatype='real' name='[maiz_amarillo]' role='measure' type='quantitative' />
+            <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+            <column-instance column='[CVE_MUN]' derivation='None' name='[none:CVE_MUN:nk]' pivot='key' type='nominal' />
+            <column-instance column='[entidad]' derivation='None' name='[none:entidad:nk]' pivot='key' type='nominal' />
+            <column-instance column='[municipio]' derivation='None' name='[none:municipio:nk]' pivot='key' type='nominal' />
+            <column-instance column='[maiz_amarillo]' derivation='Sum' name='[sum:maiz_amarillo:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_amarillo:qk]' num-steps='5' palette='brown_10_0' type='interpolated' />
+          </style-rule>
+          <style-rule element='map-layer'>
+            <format attr='enabled' id='b01002_001e' value='false' />
+            <format attr='enabled' id='b01002_002e' value='false' />
+            <format attr='enabled' id='b01002_003e' value='false' />
+            <format attr='enabled' id='dp02_0001e' value='false' />
+            <format attr='enabled' id='dp02_0015e' value='false' />
+            <format attr='enabled' id='dp03_0027e_plus_dp03_0029e' value='false' />
+            <format attr='enabled' id='dp03_0028e' value='false' />
+            <format attr='enabled' id='dp03_0030e_plus_dp03_0031e' value='false' />
+            <format attr='enabled' id='dp03_0062e' value='false' />
+            <format attr='enabled' id='dp03_0088e' value='false' />
+            <format attr='enabled' id='dp04_0001e' value='false' />
+            <format attr='enabled' id='dp04_0046e' value='false' />
+            <format attr='enabled' id='dp04_0047e' value='false' />
+            <format attr='enabled' id='dp04_0089e' value='false' />
+            <format attr='enabled' id='dp05_0001e' value='false' />
+            <format attr='enabled' id='dp05_0002e_div_dp05_0003e' value='false' />
+            <format attr='enabled' id='dp05_0032e' value='false' />
+            <format attr='enabled' id='dp05_0033e' value='false' />
+            <format attr='enabled' id='dp05_0034e' value='false' />
+            <format attr='enabled' id='dp05_0039e' value='false' />
+            <format attr='enabled' id='dp05_0047e' value='false' />
+            <format attr='enabled' id='dp05_0053e' value='false' />
+            <format attr='enabled' id='dp05_0066e' value='false' />
+            <format attr='enabled' id='dp05_0077e' value='false' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0' />
+            <format attr='map-style' value='outdoors' />
+          </style-rule>
+          <style-rule element='map-data-layer'>
+            <format attr='palette' value='tableau-map-blue-green-light' />
+            <format attr='geo-area-type' value='State' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_amarillo:qk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]' />
+              <geometry column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-transparency' value='255' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Latitude (generated)]</rows>
+        <cols>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{7B4B14D0-8579-407C-BBF6-F489DF252C94}' />
+    </worksheet>
+    <worksheet name='Maiz Blanco'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold='true' fontalignment='1'>Maiz Blanco (Hectáreas)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='INEGI Maiz Data' name='federated.07wqxzq0kq4dq60zs2srb073ushf' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='federated.07wqxzq0kq4dq60zs2srb073ushf'>
+            <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+            <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+            <column-instance column='[Geometry]' derivation='Collect' name='[clct:Geometry:nk]' pivot='key' type='nominal' />
+            <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+            <column caption='Maiz Blanco' datatype='real' name='[maiz_blanco]' role='measure' type='quantitative' />
+            <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+            <column-instance column='[CVE_MUN]' derivation='None' name='[none:CVE_MUN:nk]' pivot='key' type='nominal' />
+            <column-instance column='[entidad]' derivation='None' name='[none:entidad:nk]' pivot='key' type='nominal' />
+            <column-instance column='[municipio]' derivation='None' name='[none:municipio:nk]' pivot='key' type='nominal' />
+            <column-instance column='[maiz_blanco]' derivation='Sum' name='[sum:maiz_blanco:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]' num-steps='5' palette='blue_teal_10_0' type='interpolated' />
+          </style-rule>
+          <style-rule element='map-layer'>
+            <format attr='enabled' id='b01002_001e' value='false' />
+            <format attr='enabled' id='b01002_002e' value='false' />
+            <format attr='enabled' id='b01002_003e' value='false' />
+            <format attr='enabled' id='dp02_0001e' value='false' />
+            <format attr='enabled' id='dp02_0015e' value='false' />
+            <format attr='enabled' id='dp03_0027e_plus_dp03_0029e' value='false' />
+            <format attr='enabled' id='dp03_0028e' value='false' />
+            <format attr='enabled' id='dp03_0030e_plus_dp03_0031e' value='false' />
+            <format attr='enabled' id='dp03_0062e' value='false' />
+            <format attr='enabled' id='dp03_0088e' value='false' />
+            <format attr='enabled' id='dp04_0001e' value='false' />
+            <format attr='enabled' id='dp04_0046e' value='false' />
+            <format attr='enabled' id='dp04_0047e' value='false' />
+            <format attr='enabled' id='dp04_0089e' value='false' />
+            <format attr='enabled' id='dp05_0001e' value='false' />
+            <format attr='enabled' id='dp05_0002e_div_dp05_0003e' value='false' />
+            <format attr='enabled' id='dp05_0032e' value='false' />
+            <format attr='enabled' id='dp05_0033e' value='false' />
+            <format attr='enabled' id='dp05_0034e' value='false' />
+            <format attr='enabled' id='dp05_0039e' value='false' />
+            <format attr='enabled' id='dp05_0047e' value='false' />
+            <format attr='enabled' id='dp05_0053e' value='false' />
+            <format attr='enabled' id='dp05_0066e' value='false' />
+            <format attr='enabled' id='dp05_0077e' value='false' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0' />
+            <format attr='map-style' value='outdoors' />
+          </style-rule>
+          <style-rule element='map-data-layer'>
+            <format attr='palette' value='tableau-map-blue-green-light' />
+            <format attr='geo-area-type' value='State' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]' />
+              <geometry column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='has-halo' value='false' />
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-transparency' value='255' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Latitude (generated)]</rows>
+        <cols>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{CD227D51-BAC7-4C05-ACB0-C840C6376ED0}' />
+    </worksheet>
+    <worksheet name='Maiz Total'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold='true' fontalignment='1'>Maiz Total (Hectáreas)</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='INEGI Maiz Data' name='federated.07wqxzq0kq4dq60zs2srb073ushf' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='federated.07wqxzq0kq4dq60zs2srb073ushf'>
+            <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+            <column caption='Maiz Total' datatype='real' name='[Calculation_399975944098455554]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[maiz_amarillo] + [maiz_blanco] + [maiz_forrajero]' />
+            </column>
+            <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+            <column-instance column='[Geometry]' derivation='Collect' name='[clct:Geometry:nk]' pivot='key' type='nominal' />
+            <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+            <column caption='Maiz Amarillo' datatype='real' name='[maiz_amarillo]' role='measure' type='quantitative' />
+            <column caption='Maiz Blanco' datatype='real' name='[maiz_blanco]' role='measure' type='quantitative' />
+            <column caption='Maiz Forrajero' datatype='real' name='[maiz_forrajero]' role='measure' type='quantitative' />
+            <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+            <column-instance column='[CVE_MUN]' derivation='None' name='[none:CVE_MUN:nk]' pivot='key' type='nominal' />
+            <column-instance column='[entidad]' derivation='None' name='[none:entidad:nk]' pivot='key' type='nominal' />
+            <column-instance column='[municipio]' derivation='None' name='[none:municipio:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_399975944098455554]' derivation='Sum' name='[sum:Calculation_399975944098455554:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]' num-steps='5' palette='green_gold_10_0' type='interpolated' />
+          </style-rule>
+          <style-rule element='map-layer'>
+            <format attr='enabled' id='b01002_001e' value='false' />
+            <format attr='enabled' id='b01002_002e' value='false' />
+            <format attr='enabled' id='b01002_003e' value='false' />
+            <format attr='enabled' id='dp02_0001e' value='false' />
+            <format attr='enabled' id='dp02_0015e' value='false' />
+            <format attr='enabled' id='dp03_0027e_plus_dp03_0029e' value='false' />
+            <format attr='enabled' id='dp03_0028e' value='false' />
+            <format attr='enabled' id='dp03_0030e_plus_dp03_0031e' value='false' />
+            <format attr='enabled' id='dp03_0062e' value='false' />
+            <format attr='enabled' id='dp03_0088e' value='false' />
+            <format attr='enabled' id='dp04_0001e' value='false' />
+            <format attr='enabled' id='dp04_0046e' value='false' />
+            <format attr='enabled' id='dp04_0047e' value='false' />
+            <format attr='enabled' id='dp04_0089e' value='false' />
+            <format attr='enabled' id='dp05_0001e' value='false' />
+            <format attr='enabled' id='dp05_0002e_div_dp05_0003e' value='false' />
+            <format attr='enabled' id='dp05_0032e' value='false' />
+            <format attr='enabled' id='dp05_0033e' value='false' />
+            <format attr='enabled' id='dp05_0034e' value='false' />
+            <format attr='enabled' id='dp05_0039e' value='false' />
+            <format attr='enabled' id='dp05_0047e' value='false' />
+            <format attr='enabled' id='dp05_0053e' value='false' />
+            <format attr='enabled' id='dp05_0066e' value='false' />
+            <format attr='enabled' id='dp05_0077e' value='false' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0' />
+            <format attr='map-style' value='outdoors' />
+          </style-rule>
+          <style-rule element='map-data-layer'>
+            <format attr='palette' value='tableau-map-blue-green-light' />
+            <format attr='geo-area-type' value='State' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]' />
+              <geometry column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-transparency' value='255' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Latitude (generated)]</rows>
+        <cols>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{242472B5-F10F-432D-9DA4-C9913F2D0CE3}' />
+    </worksheet>
+    <worksheet name='Porcentaje de sembrado'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold='true' fontalignment='1'>Porcentaje de hectáreas de maiz sobre el total del área </run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='INEGI Maiz Data' name='federated.07wqxzq0kq4dq60zs2srb073ushf' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='federated.07wqxzq0kq4dq60zs2srb073ushf'>
+            <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+            <column caption='Maiz Total' datatype='real' name='[Calculation_399975944098455554]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[maiz_amarillo] + [maiz_blanco] + [maiz_forrajero]' />
+            </column>
+            <column caption='Area km2' datatype='real' name='[Calculation_399975944098521091]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AREA([Geometry], &apos;km&apos;)' />
+            </column>
+            <column caption='Area ha' datatype='real' name='[Calculation_399975944098590724]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[Calculation_399975944098521091]*100' />
+            </column>
+            <column caption='Porcentaje de sembrado' datatype='real' name='[Calculation_399975944098627589]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[Calculation_399975944098455554]&#13;&#10;/[Calculation_399975944098590724]' />
+            </column>
+            <column caption='Categoría Sembrado' datatype='string' name='[Calculation_399975944099446790]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF &#13;&#10;    [Calculation_399975944098627589]&gt;0 AND [Calculation_399975944098627589]&lt;=0.2&#13;&#10;    THEN &apos;0-20%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.2 AND [Calculation_399975944098627589]&lt;=0.4&#13;&#10;    THEN &apos;20-40%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.4 AND [Calculation_399975944098627589]&lt;=0.6&#13;&#10;    THEN &apos;40-60%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.6 AND [Calculation_399975944098627589]&lt;=0.8&#13;&#10;    THEN &apos;60-80%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.8 AND [Calculation_399975944098627589]&lt;=1&#13;&#10;    THEN &apos;80-100%&apos;&#13;&#10;ELSE &apos;No hay datos&apos;&#13;&#10;END' />
+            </column>
+            <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+            <column-instance column='[Geometry]' derivation='Collect' name='[clct:Geometry:nk]' pivot='key' type='nominal' />
+            <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+            <column caption='Maiz Amarillo' datatype='real' name='[maiz_amarillo]' role='measure' type='quantitative' />
+            <column caption='Maiz Blanco' datatype='real' name='[maiz_blanco]' role='measure' type='quantitative' />
+            <column caption='Maiz Forrajero' datatype='real' name='[maiz_forrajero]' role='measure' type='quantitative' />
+            <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+            <column-instance column='[CVE_MUN]' derivation='None' name='[none:CVE_MUN:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_399975944099446790]' derivation='None' name='[none:Calculation_399975944099446790:nk]' pivot='key' type='nominal' />
+            <column-instance column='[entidad]' derivation='None' name='[none:entidad:nk]' pivot='key' type='nominal' />
+            <column-instance column='[municipio]' derivation='None' name='[none:municipio:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='map-layer'>
+            <format attr='enabled' id='b01002_001e' value='false' />
+            <format attr='enabled' id='b01002_002e' value='false' />
+            <format attr='enabled' id='b01002_003e' value='false' />
+            <format attr='enabled' id='dp02_0001e' value='false' />
+            <format attr='enabled' id='dp02_0015e' value='false' />
+            <format attr='enabled' id='dp03_0027e_plus_dp03_0029e' value='false' />
+            <format attr='enabled' id='dp03_0028e' value='false' />
+            <format attr='enabled' id='dp03_0030e_plus_dp03_0031e' value='false' />
+            <format attr='enabled' id='dp03_0062e' value='false' />
+            <format attr='enabled' id='dp03_0088e' value='false' />
+            <format attr='enabled' id='dp04_0001e' value='false' />
+            <format attr='enabled' id='dp04_0046e' value='false' />
+            <format attr='enabled' id='dp04_0047e' value='false' />
+            <format attr='enabled' id='dp04_0089e' value='false' />
+            <format attr='enabled' id='dp05_0001e' value='false' />
+            <format attr='enabled' id='dp05_0002e_div_dp05_0003e' value='false' />
+            <format attr='enabled' id='dp05_0032e' value='false' />
+            <format attr='enabled' id='dp05_0033e' value='false' />
+            <format attr='enabled' id='dp05_0034e' value='false' />
+            <format attr='enabled' id='dp05_0039e' value='false' />
+            <format attr='enabled' id='dp05_0047e' value='false' />
+            <format attr='enabled' id='dp05_0053e' value='false' />
+            <format attr='enabled' id='dp05_0066e' value='false' />
+            <format attr='enabled' id='dp05_0077e' value='false' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0' />
+            <format attr='map-style' value='outdoors' />
+          </style-rule>
+          <style-rule element='map-data-layer'>
+            <format attr='palette' value='tableau-map-blue-green-light' />
+            <format attr='geo-area-type' value='State' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]' />
+              <geometry column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-transparency' value='255' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Latitude (generated)]</rows>
+        <cols>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{16155774-99DD-4F4E-814E-308ADCB85EF9}' />
+    </worksheet>
+    <worksheet name='Porcentaje de sembrado 2'>
+      <layout-options>
+        <title>
+          <formatted-text>
+            <run bold='true' fontalignment='1'>Zonas de mayor área de sembrado</run>
+          </formatted-text>
+        </title>
+      </layout-options>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='INEGI Maiz Data' name='federated.07wqxzq0kq4dq60zs2srb073ushf' />
+          </datasources>
+          <mapsources>
+            <mapsource name='Tableau' />
+          </mapsources>
+          <datasource-dependencies datasource='federated.07wqxzq0kq4dq60zs2srb073ushf'>
+            <column caption='Cve Mun' datatype='string' name='[CVE_MUN]' role='dimension' type='nominal' />
+            <column caption='Maiz Total' datatype='real' name='[Calculation_399975944098455554]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[maiz_amarillo] + [maiz_blanco] + [maiz_forrajero]' />
+            </column>
+            <column caption='Area km2' datatype='real' name='[Calculation_399975944098521091]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='AREA([Geometry], &apos;km&apos;)' />
+            </column>
+            <column caption='Area ha' datatype='real' name='[Calculation_399975944098590724]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[Calculation_399975944098521091]*100' />
+            </column>
+            <column caption='Porcentaje de sembrado' datatype='real' name='[Calculation_399975944098627589]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='[Calculation_399975944098455554]&#13;&#10;/[Calculation_399975944098590724]' />
+            </column>
+            <column caption='Categoría Sembrado' datatype='string' name='[Calculation_399975944099446790]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF &#13;&#10;    [Calculation_399975944098627589]&gt;0 AND [Calculation_399975944098627589]&lt;=0.2&#13;&#10;    THEN &apos;0-20%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.2 AND [Calculation_399975944098627589]&lt;=0.4&#13;&#10;    THEN &apos;20-40%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.4 AND [Calculation_399975944098627589]&lt;=0.6&#13;&#10;    THEN &apos;40-60%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.6 AND [Calculation_399975944098627589]&lt;=0.8&#13;&#10;    THEN &apos;60-80%&apos;&#13;&#10;ELSEIF &#13;&#10;    [Calculation_399975944098627589]&gt;0.8 AND [Calculation_399975944098627589]&lt;=1&#13;&#10;    THEN &apos;80-100%&apos;&#13;&#10;ELSE &apos;No hay datos&apos;&#13;&#10;END' />
+            </column>
+            <column caption='Geometría' datatype='spatial' name='[Geometry]' role='measure' type='nominal' />
+            <column-instance column='[Geometry]' derivation='Collect' name='[clct:Geometry:nk]' pivot='key' type='nominal' />
+            <column caption='Entidad' datatype='string' name='[entidad]' role='dimension' type='nominal' />
+            <column caption='Maiz Amarillo' datatype='real' name='[maiz_amarillo]' role='measure' type='quantitative' />
+            <column caption='Maiz Blanco' datatype='real' name='[maiz_blanco]' role='measure' type='quantitative' />
+            <column caption='Maiz Forrajero' datatype='real' name='[maiz_forrajero]' role='measure' type='quantitative' />
+            <column caption='Municipio' datatype='string' name='[municipio]' role='dimension' type='nominal' />
+            <column-instance column='[CVE_MUN]' derivation='None' name='[none:CVE_MUN:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_399975944099446790]' derivation='None' name='[none:Calculation_399975944099446790:nk]' pivot='key' type='nominal' />
+            <column-instance column='[entidad]' derivation='None' name='[none:entidad:nk]' pivot='key' type='nominal' />
+            <column-instance column='[municipio]' derivation='None' name='[none:municipio:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]'>
+            <groupfilter function='union' user:ui-domain='database' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
+              <groupfilter function='member' level='[none:Calculation_399975944099446790:nk]' member='&quot;20-40\%&quot;' />
+              <groupfilter function='member' level='[none:Calculation_399975944099446790:nk]' member='&quot;40-60\%&quot;' />
+              <groupfilter function='member' level='[none:Calculation_399975944099446790:nk]' member='&quot;60-80\%&quot;' />
+              <groupfilter function='member' level='[none:Calculation_399975944099446790:nk]' member='&quot;80-100\%&quot;' />
+              <groupfilter function='member' level='[none:Calculation_399975944099446790:nk]' member='&quot;No hay datos&quot;' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='map-layer'>
+            <format attr='enabled' id='b01002_001e' value='false' />
+            <format attr='enabled' id='b01002_002e' value='false' />
+            <format attr='enabled' id='b01002_003e' value='false' />
+            <format attr='enabled' id='dp02_0001e' value='false' />
+            <format attr='enabled' id='dp02_0015e' value='false' />
+            <format attr='enabled' id='dp03_0027e_plus_dp03_0029e' value='false' />
+            <format attr='enabled' id='dp03_0028e' value='false' />
+            <format attr='enabled' id='dp03_0030e_plus_dp03_0031e' value='false' />
+            <format attr='enabled' id='dp03_0062e' value='false' />
+            <format attr='enabled' id='dp03_0088e' value='false' />
+            <format attr='enabled' id='dp04_0001e' value='false' />
+            <format attr='enabled' id='dp04_0046e' value='false' />
+            <format attr='enabled' id='dp04_0047e' value='false' />
+            <format attr='enabled' id='dp04_0089e' value='false' />
+            <format attr='enabled' id='dp05_0001e' value='false' />
+            <format attr='enabled' id='dp05_0002e_div_dp05_0003e' value='false' />
+            <format attr='enabled' id='dp05_0032e' value='false' />
+            <format attr='enabled' id='dp05_0033e' value='false' />
+            <format attr='enabled' id='dp05_0034e' value='false' />
+            <format attr='enabled' id='dp05_0039e' value='false' />
+            <format attr='enabled' id='dp05_0047e' value='false' />
+            <format attr='enabled' id='dp05_0053e' value='false' />
+            <format attr='enabled' id='dp05_0066e' value='false' />
+            <format attr='enabled' id='dp05_0077e' value='false' />
+          </style-rule>
+          <style-rule element='map'>
+            <format attr='washout' value='0' />
+            <format attr='map-style' value='outdoors' />
+          </style-rule>
+          <style-rule element='map-data-layer'>
+            <format attr='palette' value='tableau-map-blue-green-light' />
+            <format attr='geo-area-type' value='State' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]' />
+              <lod column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]' />
+              <geometry column='[federated.07wqxzq0kq4dq60zs2srb073ushf].[clct:Geometry:nk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='has-stroke' value='false' />
+                <format attr='mark-color' value='#e15759' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Latitude (generated)]</rows>
+        <cols>[federated.07wqxzq0kq4dq60zs2srb073ushf].[Longitude (generated)]</cols>
+      </table>
+      <simple-id uuid='{A9B2B24F-C255-4600-90BE-CB03A74FA9C4}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard enable-sort-zone-taborder='true' name='Siembra de Maiz Mexico'>
+      <style />
+      <size sizing-mode='automatic' />
+      <zones>
+        <zone h='100000' id='4' type-v2='layout-basic' w='100000' x='0' y='0'>
+          <zone h='86331' id='3' param='vert' type-v2='layout-flow' w='98950' x='525' y='12734'>
+            <zone h='86331' id='25' param='vert' type-v2='layout-flow' w='98950' x='525' y='12734'>
+              <zone h='43808' id='10' param='horz' type-v2='layout-flow' w='98426' x='787' y='13201'>
+                <zone h='42874' id='13' param='vert' type-v2='layout-flow' w='32634' x='1049' y='13668'>
+                  <zone h='36449' id='11' name='Maiz Amarillo' w='32110' x='1311' y='14135'>
+                    <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone h='5491' id='12' name='Maiz Amarillo' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_amarillo:qk]' show-title='false' type-v2='color' w='32110' x='1311' y='50584'>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone h='42874' id='16' param='vert' type-v2='layout-flow' w='32634' x='33683' y='13668'>
+                  <zone h='36449' id='14' name='Maiz Blanco' w='32110' x='33945' y='14135'>
+                    <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone h='5491' id='15' name='Maiz Blanco' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]' show-title='false' type-v2='color' w='32110' x='33945' y='50584'>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone h='42874' id='19' param='vert' type-v2='layout-flow' w='32634' x='66317' y='13668'>
+                  <zone h='36449' id='17' name='Maiz Total' w='32110' x='66579' y='14135'>
+                    <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone h='5491' id='18' name='Maiz Total' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]' show-title='false' type-v2='color' w='32110' x='66579' y='50584'>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='41589' id='24' param='horz' type-v2='layout-flow' w='98426' x='787' y='57009'>
+                <zone h='40655' id='22' param='vert' type-v2='layout-flow' w='66208' x='1049' y='57476'>
+                  <zone h='36450' id='20' name='Porcentaje de sembrado' w='65684' x='1311' y='57943'>
+                    <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone h='3271' id='21' leg-item-layout='horz' name='Porcentaje de sembrado' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]' show-title='false' type-v2='color' w='65684' x='1311' y='94393'>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone h='40655' id='23' name='Porcentaje de sembrado 2' w='31694' x='67257' y='57476'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='4' />
+              </zone-style>
+            </zone>
+          </zone>
+          <zone h='11799' id='5' param='vert' type-v2='layout-flow' w='98950' x='525' y='935'>
+            <zone h='11799' id='8' param='horz' type-v2='layout-flow' w='98950' x='525' y='935'>
+              <zone h='10865' id='7' is-scaled='1' param='C:/Users/fernando.dorantes/local/Git_repositories/Repo30DayMapChallenge2025/images/corn+husk+corns+food+fruit+icon-1320168015262359917_512px.png' type-v2='bitmap' w='17367' x='787' y='1402'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone fixed-size='714' forceUpdate='true' h='10865' id='6' is-fixed='true' type-v2='text' w='47375' x='18154' y='1402'>
+                <formatted-text>
+                  <run bold='true' fontalignment='1' fontname='Tableau Medium' fontsize='18'>Siembra de Maiz en México</run>
+                </formatted-text>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='10865' id='26' param='horz' type-v2='layout-flow' w='17498' x='65529' y='1402'>
+                <zone forceUpdate='true' h='9931' id='27' type-v2='text' w='16974' x='65791' y='1869'>
+                  <formatted-text>
+                    <run bold='true' fontsize='10' italic='true'>Fuente: INEGI, 2025</run>
+                    <run>Æ&#10;</run>
+                    <run bold='true'>Autor: Fernando Dorantes Nieto</run>
+                    <run>Æ&#10;</run>
+                    <run bold='true'>30DayMapChallenge 2025</run>
+                  </formatted-text>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                  </zone-style>
+                </zone>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone h='10865' id='9' type-v2='empty' w='16186' x='83027' y='1402'>
+                <zone-style>
+                  <format attr='border-color' value='#000000' />
+                  <format attr='border-style' value='none' />
+                  <format attr='border-width' value='0' />
+                  <format attr='margin' value='4' />
+                </zone-style>
+              </zone>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='4' />
+              </zone-style>
+            </zone>
+          </zone>
+          <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='8' />
+          </zone-style>
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout auto-generated='true' name='Phone'>
+          <size maxheight='1950' minheight='1950' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='31' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98130' id='30' param='vert' type-v2='layout-flow' w='98950' x='525' y='935'>
+                <zone fixed-size='79' h='10865' id='7' is-fixed='true' is-scaled='1' param='C:/Users/fernando.dorantes/local/Git_repositories/Repo30DayMapChallenge2025/images/corn+husk+corns+food+fruit+icon-1320168015262359917_512px.png' type-v2='bitmap' w='17367' x='787' y='1402'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='714' forceUpdate='true' h='10865' id='6' type-v2='text' w='47375' x='18154' y='1402'>
+                  <formatted-text>
+                    <run bold='true' fontalignment='1' fontname='Tableau Medium' fontsize='18'>Siembra de Maiz en México</run>
+                  </formatted-text>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone forceUpdate='true' h='9931' id='27' type-v2='text' w='16974' x='65791' y='1869'>
+                  <formatted-text>
+                    <run bold='true' fontsize='10' italic='true'>Fuente: INEGI, 2025</run>
+                    <run>Æ&#10;</run>
+                    <run bold='true'>Autor: Fernando Dorantes Nieto</run>
+                    <run>Æ&#10;</run>
+                    <run bold='true'>30DayMapChallenge 2025</run>
+                  </formatted-text>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='36449' id='11' is-fixed='true' name='Maiz Amarillo' w='32110' x='1311' y='14135'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone h='5491' id='12' name='Maiz Amarillo' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_amarillo:qk]' show-title='false' type-v2='color' w='32110' x='1311' y='50584'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='36449' id='14' is-fixed='true' name='Maiz Blanco' w='32110' x='33945' y='14135'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone h='5491' id='15' name='Maiz Blanco' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]' show-title='false' type-v2='color' w='32110' x='33945' y='50584'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='36449' id='17' is-fixed='true' name='Maiz Total' w='32110' x='66579' y='14135'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone h='5491' id='18' name='Maiz Total' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]' show-title='false' type-v2='color' w='32110' x='66579' y='50584'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='40655' id='23' is-fixed='true' name='Porcentaje de sembrado 2' w='31694' x='67257' y='57476'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone fixed-size='280' h='36450' id='20' is-fixed='true' name='Porcentaje de sembrado' w='65684' x='1311' y='57943'>
+                  <layout-cache minheight='244' minwidth='202' type-h='scalable' type-w='scalable' />
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+                <zone h='3271' id='21' leg-item-layout='horz' name='Porcentaje de sembrado' pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]' show-title='false' type-v2='color' w='65684' x='1311' y='94393'>
+                  <zone-style>
+                    <format attr='border-color' value='#000000' />
+                    <format attr='border-style' value='none' />
+                    <format attr='border-width' value='0' />
+                    <format attr='margin' value='4' />
+                    <format attr='padding' value='0' />
+                  </zone-style>
+                </zone>
+              </zone>
+              <zone-style>
+                <format attr='border-color' value='#000000' />
+                <format attr='border-style' value='none' />
+                <format attr='border-width' value='0' />
+                <format attr='margin' value='8' />
+              </zone-style>
+            </zone>
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{3C646D3A-F42F-4A5F-87E1-97BB3E45C6F6}' />
+    </dashboard>
+  </dashboards>
+  <windows source-height='30'>
+    <window class='dashboard' maximized='true' name='Siembra de Maiz Mexico'>
+      <viewpoints>
+        <viewpoint name='Maiz Amarillo'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Maiz Blanco'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Maiz Total'>
+          <zoom type='entire-view' />
+        </viewpoint>
+        <viewpoint name='Porcentaje de sembrado'>
+          <zoom type='entire-view' />
+          <highlight>
+            <color-one-way>
+              <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]</field>
+            </color-one-way>
+          </highlight>
+        </viewpoint>
+        <viewpoint name='Porcentaje de sembrado 2'>
+          <zoom type='entire-view' />
+        </viewpoint>
+      </viewpoints>
+      <active id='27' />
+      <simple-id uuid='{888DEE96-80A7-4F0A-8285-E52BABB76520}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Maiz Amarillo'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='175'>
+            <card pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_amarillo:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{F5AA0B61-C08C-42B3-84E5-A3E489BBFFAB}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Maiz Blanco'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='175'>
+            <card pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:maiz_blanco:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{DE2F3AF9-5A46-472C-A127-DF7EC442F76C}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Maiz Total'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='175'>
+            <card pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[sum:Calculation_399975944098455554:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{4E462BB4-E592-4C28-A64E-44F1C5310D2F}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Porcentaje de sembrado'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='175'>
+            <card pane-specification-id='0' param='[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{6381079A-0C9A-4508-9BC6-A01C329F4F47}' />
+    </window>
+    <window class='worksheet' hidden='true' name='Porcentaje de sembrado 2'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:CVE_MUN:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:Calculation_399975944099446790:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:entidad:nk]</field>
+            <field>[federated.07wqxzq0kq4dq60zs2srb073ushf].[none:municipio:nk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{BCF9BB5E-4639-4680-ACC2-A14A1810163A}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Siembra de Maiz Mexico' width='192'>
+      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
+    </thumbnail>
+  </thumbnails>
+</workbook>
