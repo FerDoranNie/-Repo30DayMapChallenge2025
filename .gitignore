@@ -9,7 +9,7 @@ Data/
 *.rar
 *.Rhistory
 __pycache__/
-.pyc
-.twbx
-.twb
-.twbr
+*.pyc
+*.twbx
+*.twb
+*.twbr

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Cartograma de Población de México</title>
+    <!-- Importamos la biblioteca D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            font-weight: 300;
+        }
+
+        /* Estilos para el mapa y los círculos */
+        .mapa-fondo {
+            fill: #eee;
+            stroke: #ccc;
+        }
+
+        .circulo-estado {
+            fill: #007bff;
+            fill-opacity: 0.7;
+            stroke: #0056b3;
+            stroke-width: 1px;
+        }
+
+        /* Estilos para el tooltip (la ventana emergente) */
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            pointer-events: none; /* Para que el mouse no interactúe con el tooltip */
+            transition: opacity 0.2s;
+        }
+
+        #tooltip strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Cartograma de Población de México (Censo 2020)</h1>
+    
+    <!-- El contenedor del SVG donde se dibujará el mapa -->
+    <svg id="cartogram" width="960" height="600"></svg>
+    
+    <!-- El div que usaremos como tooltip -->
+    <div id="tooltip"></div>
+
+    <script>
+        // --- 1. DATOS DE POBLACIÓN (INEGI Censo 2020) ---
+        // Usamos un objeto (JSON) para mapear el nombre del estado a su población.
+        // Nombres AJUSTADOS para coincidir con el nuevo GeoJSON
+        const DATOS_POBLACION = {
+            "Aguascalientes": 1425607,
+            "Baja California": 3769020,
+            "Baja California Sur": 798447,
+            "Campeche": 928363,
+            "Coahuila": 3146771, // Ajustado (antes "Coahuila de Zaragoza")
+            "Colima": 731391,
+            "Chiapas": 5543828,
+            "Chihuahua": 3741869,
+            "Ciudad de México": 9209944,
+            "Durango": 1832650,
+            "Guanajuato": 6166934,
+            "Guerrero": 3540685,
+            "Hidalgo": 3082841,
+            "Jalisco": 8348151,
+            "México": 16992418,
+            "Michoacán": 4748846, // Ajustado (antes "Michoacán de Ocampo")
+            "Morelos": 1971520,
+            "Nayarit": 1235456,
+            "Nuevo León": 5784442,
+            "Oaxaca": 4132148,
+            "Puebla": 6583278,
+            "Querétaro": 2368467,
+            "Quintana Roo": 1857985,
+            "San Luis Potosí": 2822255,
+            "Sinaloa": 3026943,
+            "Sonora": 2944840,
+            "Tabasco": 2402598,
+            "Tamaulipas": 3527735,
+            "Tlaxcala": 1342977,
+            "Veracruz": 8062579, // Ajustado (antes "Veracruz de Ignacio de la Llave")
+            "Yucatán": 2320898,
+            "Zacatecas": 1622138
+        };
+
+        // --- 2. CONFIGURACIÓN DEL SVG Y PROYECCIÓN ---
+        const width = 960;
+        const height = 600;
+
+        const svg = d3.select("#cartogram");
+
+        // Tooltip
+        const tooltip = d3.select("#tooltip");
+
+        // URL del GeoJSON con los estados de México (NUEVA URL CORREGIDA)
+        const urlGeoJSON = "https://raw.githubusercontent.com/angelnmara/geojson-mexico/master/estados.geojson";
+
+        // Creamos una proyección de Mercator y la ajustamos al tamaño del SVG
+        const proyeccion = d3.geoMercator();
+        
+        // El generador de paths
+        const pathGenerator = d3.geoPath(proyeccion);
+
+        // Creamos una escala para el radio de los círculos.
+        // Usamos scaleSqrt() porque el ÁREA (πr²) debe ser proporcional a la población,
+        // por lo tanto, el RADIO (r) debe ser proporcional a la raíz cuadrada (sqrt) de la población.
+        const radioScale = d3.scaleSqrt()
+            .domain([0, d3.max(Object.values(DATOS_POBLACION))]) // Dominio: 0 a la población máxima
+            .range([3, 55]); // Rango: radio de 3px (mín) a 55px (máx)
+
+        // --- 3. CARGA DE DATOS Y DIBUJO ---
+        d3.json(urlGeoJSON).then(geoData => {
+
+            // Ajustamos la proyección para que se centre y quepa el GeoJSON
+            proyeccion.fitSize([width, height], geoData);
+
+            // Obtenemos los 'features' (los estados)
+            let estadosFeatures = geoData.features;
+
+            // --- 4. PREPARACIÓN DE LOS NODOS PARA LA SIMULACIÓN ---
+            
+            // Creamos un array de "nodos". Cada nodo es un objeto que representa un estado.
+            const nodos = estadosFeatures.map(feature => {
+                // AJUSTADO: El nuevo GeoJSON usa 'nombre' en lugar de 'name'
+                const nombreEstado = feature.properties.nombre; 
+                const poblacion = DATOS_POBLACION[nombreEstado] || 0;
+                
+                // Calculamos el centroide (coordenadas [x, y] en píxeles) del estado
+                const centroide = pathGenerator.centroid(feature);
+
+                return {
+                    id: nombreEstado,
+                    nombre: nombreEstado,
+                    poblacion: poblacion,
+                    radio: radioScale(poblacion),
+                    // Posición inicial (x, y) basada en el centroide geográfico
+                    x: centroide[0], 
+                    y: centroide[1],
+                    // Guardamos la posición original para "atraer" el círculo
+                    geoX: centroide[0],
+                    geoY: centroide[1]
+                };
+            });
+
+            // --- 5. DIBUJAR EL MAPA DE FONDO (OPCIONAL PERO ÚTIL) ---
+            svg.append("g")
+                .selectAll("path")
+                .data(estadosFeatures)
+                .join("path")
+                .attr("d", pathGenerator)
+                .attr("class", "mapa-fondo");
+
+            // --- 6. CONFIGURAR LA SIMULACIÓN DE FUERZAS ---
+            const simulacion = d3.forceSimulation(nodos)
+                // Fuerza de colisión: evita que los círculos se superpongan.
+                // El radio de colisión es el radio del círculo + 1px de margen.
+                .force("collide", d3.forceCollide(d => d.radio + 1).strength(0.8))
+                
+                // Fuerza X: Atrae cada nodo hacia su posición X geográfica original
+                .force("x", d3.forceX(d => d.geoX).strength(0.1))
+                
+                // Fuerza Y: Atrae cada nodo hacia su posición Y geográfica original
+                .force("y", d3.forceY(d => d.geoY).strength(0.1))
+                
+                // Le decimos a la simulación qué hacer en cada "tick" (paso)
+                .on("tick", ticked);
+
+            // --- 7. DIBUJAR LOS CÍRCULOS (NODOS) ---
+            const circulos = svg.append("g")
+                .selectAll("circle")
+                .data(nodos)
+                .join("circle")
+                .attr("class", "circulo-estado")
+                .attr("cx", d => d.x) // Posición inicial
+                .attr("cy", d => d.y) // Posición inicial
+                .attr("r", d => d.radio) // Radio basado en la población
+                // Eventos del mouse para el tooltip
+                .on("mouseover", (event, d) => {
+                    tooltip.transition().style("opacity", 1);
+                    tooltip.html(`
+                        <strong>${d.nombre}</strong>
+                        Población: ${d.poblacion.toLocaleString('es-MX')}
+                    `);
+                })
+                .on("mousemove", (event) => {
+                    // Posicionamos el tooltip cerca del cursor
+                    tooltip.style("left", (event.pageX + 10) + "px")
+                           .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseleave", () => {
+                    tooltip.transition().style("opacity", 0);
+                });
+
+            // --- 8. FUNCIÓN DE ACTUALIZACIÓN (TICK) ---
+            // Esta función se llama en cada paso de la simulación
+            function ticked() {
+                // Actualiza la posición (cx, cy) de cada círculo
+                circulos
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+            }
+
+        }).catch(error => {
+            console.error("Error al cargar el GeoJSON:", error);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Día 4: Globo con Antípodas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-weight: 300;
+        }
+        canvas {
+            background-color: #a0c8f0; /* Color océano */
+            border-radius: 50%; /* Hace que el canvas sea un círculo */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15),
+                        inset 0 0 10px rgba(255, 255, 255, 0.2);
+            cursor: move;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            pointer-events: none; /* Para que el ratón no interactúe con el tooltip */
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Día 10 Antípodas de México</h1>
+    <p>Arrastra el globo para girarlo</p>
+
+    <!-- El Canvas donde se dibujará el globo -->
+    <canvas id="globeCanvas" width="600" height="600"></canvas>
+    
+    <!-- Tooltip para mostrar el nombre de la ciudad -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // --- 1. CONFIGURACIÓN INICIAL ---
+        const canvas = document.getElementById('globeCanvas');
+        const context = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // URL del GeoJSON con el mapa del mundo (URL CORREGIDA)
+        const worldUrl = "https://cdnjs.cloudflare.com/ajax/libs/world-atlas/2.0.2/land-50m.json";
+
+        // --- 2. DATOS DE CIUDADES Y ANTÍPODAS ---
+        // Coordenadas [longitud, latitud]
+        
+        const ciudades = [
+            { nombre: "Ciudad de México", coords: [-99.1332, 19.4326] },
+            { nombre: "Guadalajara", coords: [-103.3496, 20.6597] },
+            { nombre: "Monterrey", coords: [-100.3161, 25.6866] }
+        ];
+
+        // Función para calcular la antípoda
+        const antipode = ([longitude, latitude]) => [longitude + 180, -latitude];
+
+        // Preparamos los datos en formato GeoJSON (Puntos)
+        const puntosCiudades = {
+            type: "FeatureCollection",
+            features: ciudades.map(c => ({
+                type: "Feature",
+                properties: { nombre: c.nombre, tipo: "ciudad" },
+                geometry: { type: "Point", coordinates: c.coords }
+            }))
+        };
+
+        const puntosAntipodas = {
+            type: "FeatureCollection",
+            features: ciudades.map(c => ({
+                type: "Feature",
+                properties: { nombre: `Antípoda de ${c.nombre}`, tipo: "antipoda" },
+                geometry: { type: "Point", coordinates: antipode(c.coords) }
+            }))
+        };
+
+        const todosLosPuntos = [ ...puntosCiudades.features, ...puntosAntipodas.features ];
+
+        // --- 3. PROYECCIÓN Y PATH GENERATOR ---
+        const projection = d3.geoOrthographic()
+            .scale(width / 2 - 10) // Escala del globo
+            .translate([width / 2, height / 2])
+            .clipAngle(90); // Solo muestra un hemisferio
+
+        const pathGenerator = d3.geoPath(projection, context);
+
+        const sphere = {type: "Sphere"};
+        const graticule = d3.geoGraticule10();
+
+        // --- 4. FUNCIÓN DE DIBUJO ---
+        function drawGlobe(land) {
+            context.clearRect(0, 0, width, height); // Limpiar
+
+            // 1. Dibujar el Océano (la esfera)
+            context.beginPath();
+            pathGenerator(sphere);
+            context.fillStyle = "#a0c8f0"; // Azul océano
+            context.fill();
+
+            // 2. Dibujar la retícula (líneas grises)
+            context.beginPath();
+            pathGenerator(graticule);
+            context.strokeStyle = "rgba(119,119,119,0.5)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // 3. Dibujar los continentes
+            context.beginPath();
+            pathGenerator(land);
+            context.fillStyle = "#444"; // Color tierra
+            context.fill();
+            context.strokeStyle = "rgba(0,0,0,0.4)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // 4. Dibujar los puntos (Ciudades y Antípodas)
+            todosLosPuntos.forEach(punto => {
+                context.beginPath();
+                pathGenerator(punto);
+                // D3 se encarga de no dibujar los puntos en la cara oculta
+                
+                if (punto.properties.tipo === "ciudad") {
+                    context.fillStyle = "#e63946"; // Rojo para ciudades
+                } else {
+                    context.fillStyle = "#1d3557"; // Azul para antípodas
+                }
+                context.fill();
+            });
+        }
+
+        // --- 5. CARGA DE DATOS Y EJECUCIÓN ---
+        d3.json(worldUrl).then(world => {
+            
+            const land = topojson.feature(world, world.objects.land);
+            let currentRotation = projection.rotate();
+            
+            const redraw = () => drawGlobe(land);
+            
+            // --- 6. INTERACTIVIDAD: ARRASTRAR EL GLOBO ---
+            d3.select(context.canvas).call(d3.drag()
+                .on("start", (event) => {
+                    currentRotation = projection.rotate(); // Guarda la rotación actual
+                })
+                .on("drag", (event) => {
+                    const sensitivity = 0.25; // Qué tan rápido gira
+                    const [yaw, pitch] = currentRotation;
+                    // Actualiza la rotación basada en el movimiento del ratón
+                    projection.rotate([yaw + event.dx * sensitivity, pitch - event.dy * sensitivity]);
+                    redraw(); // Redibuja el globo
+                }));
+
+            // --- 7. INTERACTIVIDAD: TOOLTIP ---
+            d3.select(context.canvas).on("mousemove", (event) => {
+                const [x, y] = d3.pointer(event);
+                
+                // Invertir la proyección: de [x, y] a [long, lat]
+                const [lon, lat] = projection.invert([x, y]);
+                
+                // Encontrar el punto más cercano
+                const closestPoint = d3.geoClosest(todosLosPuntos, [lon, lat], 10); // 10 grados de tolerancia
+                
+                if (closestPoint) {
+                    tooltip.style("opacity", 1)
+                           .style("left", `${event.pageX + 10}px`)
+                           .style("top", `${event.pageY}px`)
+                           .html(closestPoint.properties.nombre);
+                } else {
+                    tooltip.style("opacity", 0);
+                }
+            });
+
+            d3.select(context.canvas).on("mouseleave", () => {
+                tooltip.style("opacity", 0);
+            });
+
+            // Dibujo inicial
+            redraw();
+
+        }).catch(error => {
+            console.error("Error al cargar los datos del mapa:", error);
+            canvas.style.display = "none";
+            document.body.append("Error al cargar el mapa. Revisa la consola.");
+        });
+
+    </script>
+</body>
+</html>

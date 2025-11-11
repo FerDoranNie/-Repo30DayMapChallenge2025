@@ -53,29 +53,29 @@
             
             path = d3.geoPath(projection, context);
 
-            if (projection.center) { // La mayoría de las proyecciones tienen un centro
-                 if (projection.rotate) { // Para geoOrthographic
-                    // Mueve el centro de la proyección para seguir la posición del sol
-                    const sunPos = getSunPosition();
-                    projection.rotate([-sunPos[0], -sunPos[1], 0]);
-                } else {
-                    projection.fitWidth(width, sphere);
-                }
-            } else { // Para proyecciones sin 'center' ni 'fitWidth' (como d3.geoConicEqualArea() sin parámetros)
+            // Determine if the current projection is Orthographic based on the selector value
+            const isOrthographic = projectionSelector.value === "Orthographic";
+
+            if (isOrthographic) {
+                // For Orthographic, rotation is handled by the sun position or manual drag.
+                // We don't call fitWidth here as it interferes with the rotation logic.
+            } else {
+                // For other projections, fit to width and center the map.
                 projection.fitWidth(width, sphere);
             }
 
             // Calculamr la altura resultante para que no se deforme
             const [[x0, y0], [x1, y1]] = d3.geoPath(projection).bounds(sphere);
             const height = Math.ceil(y1 - y0);
-            
+
             canvas.width = width;
             canvas.height = height;
 
-            if (!projection.rotate) { // No centramos si la proyección se rota (orthographic)
-                 projection.translate([width / 2, height / 2]);
+            // Ensure non-orthographic projections are translated to the center if fitWidth doesn't perfectly center.
+            // Orthographic projection's center is implicitly managed by its rotation.
+            if (!isOrthographic) {
+                projection.translate([width / 2, height / 2]);
             }
-           
 
             // 2. Actualizar la hora en la UI
             const now = new Date();
@@ -125,11 +125,11 @@
         // --- CARGA DE DATOS Y EJECUCIÓN ---
 
         async function initializeMap() {
-            const worldUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json";
+            // Si usas un GeoJSON local, asegúrate de que la ruta sea correcta.
+            const landUrl = "./natural_earth.geojson"; // O la URL de tu GeoJSON
             
             try {
-                const world = await d3.json(worldUrl);
-                const land = topojson.feature(world, world.objects.land);
+                const land = await d3.json(landUrl); // Carga directamente el GeoJSON
 
                 // --- Lógica de Zoom y Arrastre ---
                 const zoom = d3.zoom()
@@ -163,6 +163,8 @@
 
                 d3.select(canvas).call(zoom);
 
+                let rotationInterval; // Declare rotationInterval locally to avoid global scope
+
                 const redraw = () => drawMap(land);
 
                 // Event listener para el selector de proyecciones
@@ -170,19 +172,19 @@
                     projection = getProjectionByName(event.target.value);
                     // Para la proyección ortográfica, necesitamos que rote automáticamente
                     if (event.target.value === "Orthographic") {
-                        // Guardamos el intervalo de rotación si existe
-                        if (window.rotationInterval) clearInterval(window.rotationInterval);
+                        // Clear any existing rotation interval
+                        if (rotationInterval) clearInterval(rotationInterval);
                         // Y creamos uno nuevo que rota la vista
-                        window.rotationInterval = setInterval(() => {
+                        rotationInterval = setInterval(() => {
                            const sunPos = getSunPosition();
                            projection.rotate([-sunPos[0], -sunPos[1], 0]);
                            drawMap(land);
                         }, 1000); // 1 segundo para una rotación más fluida
                     } else {
                         // Si no es ortográfica, paramos la rotación si estaba activa
-                        if (window.rotationInterval) clearInterval(window.rotationInterval);
+                        if (rotationInterval) clearInterval(rotationInterval);
                         // Restablecemos el centro si la proyección lo permite y lo necesita
-                        if (projection.center) projection.center([0,0]); 
+                        projection.center([0,0]); // All D3 projections have a center method, no need for if check
                     }
                     redraw(); // Redibujamos con la nueva proyección
                 });
