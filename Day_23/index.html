@@ -38,6 +38,7 @@
     h1 {
             font-weight: 100;
             color: #1581BF;
+            font-size: 1.8em;
             text-align: center;
             max-width: 90%;
             z-index: 10;
@@ -46,6 +47,7 @@
     h2 {
             font-weight: 100;
             color: #1581BF;
+            font-size: 1.2em;
             text-align: center;
             max-width: 90%;
             z-index: 10;
@@ -54,10 +56,26 @@
     h3 {
             font-weight: 100;
             color: #1581BF;
+            font-size: 1em;
             text-align: center;
             max-width: 90%;
             z-index: 10;
             pointer-events: none;
+    }
+    /* Mobile-first responsive styles */
+    @media screen and (max-width: 768px) {
+        h1 { font-size: 1.2em; }
+        h2 { font-size: 0.9em; }
+        h3 { font-size: 0.8em; }
+        #menu {
+            padding: 5px;
+            top: 5px;
+            left: 5px;
+        }
+        #menu button {
+            padding: 4px 8px;
+            font-size: 0.8em;
+        }
     }
 
 </style>
@@ -65,16 +83,19 @@
 <body>
 <h1>¿Cómo se ven los contornos de edificios en las principales ciudades latinoamericanas?</h1>
 <h1>#30DayMapChallenge Día 23 </h1>
-<h2>Fuente: OpenFreeMap, 2025 OpenStreetMap 2025 </h2>
-<h3>Autor: Fernando Dorantes Nieto </h2>
+<h2>Fuente: OpenStreetMap, 2025</h2>
+<h3>Autor: Fernando Dorantes Nieto</h3>
 
 <div id="menu"></div>
 <div id="map"></div>
 <script>
+  // Adjust initial zoom for mobile devices
+  const initialZoom = window.innerWidth < 768 ? 15.5 : 16.5;
+
   const map = new maplibregl.Map({
       style: `https://tiles.openfreemap.org/styles/bright`,
       center:[-99.1331994135622, 19.432899069952587], 
-      zoom: 16.5,
+      zoom: initialZoom,
       pitch: 45,
       bearing: -17.6,
       container: 'map',
