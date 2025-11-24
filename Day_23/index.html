@@ -123,7 +123,7 @@
       const button = document.createElement('button');
       button.textContent = cityName;
       button.addEventListener('click', () => {
-          map.flyTo({ center: cities[cityName], zoom: 16.5, speed: 0.2 });
+          map.flyTo({ center: cities[cityName], zoom: 16.5, speed: 0.1 });
       });
       menu.appendChild(button);
   }
