@@ -11,14 +11,17 @@
     body { margin: 0; padding: 0; }
     html, body, #map { height: 100%; }
     #menu {
+        display: block;
         position: absolute;
         background: #fff;
         padding: 10px;
         font-family: 'Open Sans', sans-serif;
         top: 10px;
         left: 10px;
-        z-index: 1;
+        z-index: 2;
         border-radius: 3px;
+        max-height: 90%;
+        overflow-y: auto;
     }
     #menu button {
         display: block;
@@ -29,7 +32,16 @@
         background: #f9f9f9;
         cursor: pointer;
     }
-    #menu button:last-child {
+    #menu-toggle {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+        cursor: pointer;
+    }
+    #menu button:last-child, #menu-toggle:last-child {
         margin-bottom: 0;
     }
     #menu button:hover {
@@ -62,32 +74,60 @@
             z-index: 10;
             pointer-events: none;
     }
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    .header-content {
+        padding: 5px 10px;
+        background: #f8f9fa;
+        text-align: center;
+    }
+    #map {
+        flex-grow: 1;
+        height: auto; /* Override height: 100% */
+    }
     /* Mobile-first responsive styles */
     @media screen and (max-width: 768px) {
         h1 { font-size: 1.2em; }
         h2 { font-size: 0.9em; }
         h3 { font-size: 0.8em; }
         #menu {
+            display: none; /* Hide by default on mobile */
             padding: 5px;
             top: 5px;
             left: 5px;
+            width: calc(100% - 20px); /* Adjust width */
         }
-        #menu button {
+        #menu.active {
+            display: block; /* Show when active */
+        }
+        #menu button, #menu-toggle {
             padding: 4px 8px;
             font-size: 0.8em;
+        }
+        #menu-toggle {
+            display: block; /* Show the toggle button */
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
         }
     }
 
 </style>
 </head>
 <body>
-<h1>¿Cómo se ven los contornos de edificios en las principales ciudades latinoamericanas?</h1>
-<h1>#30DayMapChallenge Día 23 </h1>
-<h2>Fuente: OpenStreetMap, 2025</h2>
-<h3>Autor: Fernando Dorantes Nieto</h3>
-
+<div class="main-container">
+    <div class="header-content">
+        <h1>¿Cómo se ven los contornos de edificios en las principales ciudades latinoamericanas?</h1>
+        <h2>#30DayMapChallenge Día 23 - Fuente: OpenStreetMap, 2025 - Autor: Fernando Dorantes Nieto</h2>
+    </div>
+    <div id="map"></div>
+</div>
+<button id="menu-toggle">Ciudades</button>
 <div id="menu"></div>
-<div id="map"></div>
 <script>
   // Adjust initial zoom for mobile devices
   const initialZoom = window.innerWidth < 768 ? 15.5 : 16.5;
@@ -119,13 +159,24 @@
   };
 
   const menu = document.getElementById('menu');
+  const menuToggle = document.getElementById('menu-toggle');
+
   for (const cityName in cities) {
       const button = document.createElement('button');
       button.textContent = cityName;
       button.addEventListener('click', () => {
           map.flyTo({ center: cities[cityName], zoom: 16.5, speed: 0.1 });
+          if (window.innerWidth < 768) {
+              menu.classList.remove('active'); // Hide menu on selection
+          }
       });
       menu.appendChild(button);
+  }
+
+  if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+          menu.classList.toggle('active');
+      });
   }
 
   // data from OpenStreetMap.
