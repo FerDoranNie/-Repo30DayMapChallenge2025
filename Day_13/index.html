@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Día 13: Migración del Charrán Ártico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-weight: 300;
+        }
+        .info-container {
+            max-width: 600px;
+            text-align: center;
+            padding: 10px;
+        }
+        .info-container img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .info-container h2 {
+            font-weight: 400;
+        }
+        .globes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .globe-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            background-color: #d1e5f0; /* Color océano más tenue */
+            border-radius: 50%; /* Hace que el canvas sea un círculo */
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15),
+                        inset 0 0 10px rgba(255, 255, 255, 0.2);
+            cursor: move;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            pointer-events: none; /* Para que el ratón no interactúe con el tooltip */
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="info-container">
+        <h2>Charrán ártico (Sterna paradisaea)</h2>
+        <img src="./imagen_charran.png" alt="Foto de un Charrán ártico en vuelo">
+        <p>
+            <b>Este mapa muestra dos de las rutas de migración del charrán ártico (Sterna Paradisaea), 
+            el viaje más largo conocido para un ave y quizás de un animal, 
+            va desde sus zonas de cría en el Ártico hasta la Antártida, y viceversa, cada año.
+            </b>
+        </p>
+        <h3>Autor: Fernando Dorantes Nieto</h3>
+        <h3>Fuente: BirdLife International, 2025</h3>
+        <h4>#30DayMapChallenge Día 13</h4>
+    </div>
+
+    <div class="globes-container">
+        <div class="globe-wrapper">
+            <h3>Ruta del Atlántico</h3>
+            <canvas id="globeCanvas1" width="500" height="500"></canvas>
+            <div class="tooltip" id="tooltip1"></div>
+        </div>
+        <div class="globe-wrapper">
+            <h3>Ruta del Pacífico</h3>
+            <canvas id="globeCanvas2" width="500" height="500"></canvas>
+            <div class="tooltip" id="tooltip2"></div>
+        </div>
+    </div>
+
+    <script>
+        // URL del GeoJSON con el mapa del mundo
+        const worldUrl = "https://unpkg.com/world-atlas@1/world/50m.json";
+
+        // --- Objetos GeoJSON reutilizables ---
+        const sphere = {type: "Sphere"};
+        const graticule = d3.geoGraticule10();
+
+        // --- DATOS DE LAS RUTAS ---
+        // Ruta 1: Atlántico
+        const rutaCoordsAtlantico = [
+            [-51.7, 72.0], // Inicio (Ártico/Groenlandia)
+            [-40.0, 60.0],
+            [-25.0, 40.0],
+            [-18.0, 20.0], // Costa de África
+            [0.0, 0.0],
+            [10.0, -20.0],
+            [15.0, -40.0],
+            [25.0, -70.0]  // Fin (Antártida)
+        ];
+        const rutaMigratoriaAtlantico = {
+            type: "LineString",
+            coordinates: rutaCoordsAtlantico
+        };
+        const puntosRutaAtlantico = {
+            type: "FeatureCollection",
+            features: [
+                { type: "Feature", properties: { nombre: "Cría (Groenlandia)" }, geometry: { type: "Point", coordinates: rutaCoordsAtlantico[0] }},
+                { type: "Feature", properties: { nombre: "Invernada (Antártida)" }, geometry: { type: "Point", coordinates: rutaCoordsAtlantico[rutaCoordsAtlantico.length - 1] }}
+            ]
+        };
+
+        // Ruta 2: Pacífico
+        const rutaCoordsPacifico = [
+            [-165.0, 65.0], // Inicio (Ártico/Alaska)
+            [-140.0, 50.0], // Costa de Canadá
+            [-125.0, 35.0], // Costa de California
+            [-100.0, 10.0], // Costa de Centroamérica
+            [-85.0, -10.0], // Costa de Perú
+            [-80.0, -30.0], // Costa de Chile
+            [-90.0, -70.0]  // Fin (Antártida)
+        ];
+        const rutaMigratoriaPacifico = {
+            type: "LineString",
+            coordinates: rutaCoordsPacifico
+        };
+        const puntosRutaPacifico = {
+            type: "FeatureCollection",
+            features: [
+                { type: "Feature", properties: { nombre: "Cría (Alaska)" }, geometry: { type: "Point", coordinates: rutaCoordsPacifico[0] }},
+                { type: "Feature", properties: { nombre: "Invernada (Antártida)" }, geometry: { type: "Point", coordinates: rutaCoordsPacifico[rutaCoordsPacifico.length - 1] }}
+            ]
+        };
+
+        // --- FUNCIÓN PRINCIPAL DE CONFIGURACIÓN DE GLOBO ---
+        function setupGlobe(canvasId, tooltipId, land, rutaMigratoria, puntosRuta) {
+            const canvas = document.getElementById(canvasId);
+            const context = canvas.getContext('2d');
+            const tooltip = document.getElementById(tooltipId);
+            const width = canvas.width;
+            const height = canvas.height;
+
+            const projection = d3.geoOrthographic()
+                .scale(width / 2 - 10)
+                .translate([width / 2, height / 2])
+                .clipAngle(90);
+
+            const pathGenerator = d3.geoPath(projection, context);
+
+            // Centrar la proyección inicial en la ruta
+            const centerPoint = rutaMigratoria.coordinates[Math.floor(rutaMigratoria.coordinates.length / 2)];
+            projection.rotate([-centerPoint[0], -centerPoint[1]]);
+
+            function drawGlobe() {
+                draw(pathGenerator, context, width, height, land, rutaMigratoria, puntosRuta);
+            }
+
+            drawGlobe(); // Dibujo inicial
+        }
+
+        // --- FUNCIÓN DE DIBUJO GENÉRICA ---
+        function draw(pathGenerator, context, width, height, land, rutaMigratoria, puntosRuta) {
+            context.clearRect(0, 0, width, height);
+
+            // 1. Dibujar el Océano
+            context.beginPath();
+            pathGenerator(sphere);
+            context.fillStyle = "#d1e5f0";
+            context.fill();
+
+            // 2. Dibujar la retícula
+            context.beginPath();
+            pathGenerator(graticule);
+            context.strokeStyle = "rgba(119,119,119,0.5)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // 3. Dibujar los continentes
+            context.beginPath();
+            pathGenerator(land);
+            context.fillStyle = "#8c6d4e"; // Color café
+            context.fill();
+            context.strokeStyle = "rgba(0,0,0,0.4)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // 4. Dibujar la ruta de migración
+            context.beginPath();
+            pathGenerator(rutaMigratoria);
+            context.strokeStyle = "#e63946";
+            context.lineWidth = 2.5;
+            context.stroke();
+
+            // 5. Dibujar puntos de inicio y fin
+            puntosRuta.features.forEach(punto => {
+                context.beginPath();
+                pathGenerator(punto);
+                context.fillStyle = "#e63946";
+                context.fill();
+            });
+        }
+
+        // --- CARGA DE DATOS Y EJECUCIÓN ---
+        d3.json(worldUrl).then(world => {
+            
+            const land = topojson.feature(world, world.objects.land);
+
+            // Configurar el primer globo (Atlántico)
+            setupGlobe('globeCanvas1', 'tooltip1', land, rutaMigratoriaAtlantico, puntosRutaAtlantico);
+
+            // Configurar el segundo globo (Pacífico)
+            setupGlobe('globeCanvas2', 'tooltip2', land, rutaMigratoriaPacifico, puntosRutaPacifico);
+
+        }).catch(error => {
+            console.error("Error al cargar los datos del mapa:", error);
+            canvas.style.display = "none";
+            document.body.append("Error al cargar el mapa. Revisa la consola.");
+        });
+
+    </script>
+</body>
+</html>

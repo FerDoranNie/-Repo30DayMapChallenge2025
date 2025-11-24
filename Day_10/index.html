@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Día 4: Globo con Antípodas</title>
+    <title>Día 10: Globo con Antípodas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
@@ -43,6 +43,10 @@
 <body>
 
     <h1>Día 10 Antípodas de México</h1>
+    <h3>#30DayMapChallenge 2025</h3>
+    <h4>Autor: Fernando Dorantes Nieto </h4>
+    <h4>Día 10</h4>
+
     <p>Arrastra el globo para girarlo</p>
 
     <!-- El Canvas donde se dibujará el globo -->
@@ -60,7 +64,7 @@
         const height = canvas.height;
 
         // URL del GeoJSON con el mapa del mundo (URL CORREGIDA)
-        const worldUrl = "https://cdnjs.cloudflare.com/ajax/libs/world-atlas/2.0.2/land-50m.json";
+        const worldUrl = "https://unpkg.com/world-atlas@2/land-50m.json";
 
         // --- 2. DATOS DE CIUDADES Y ANTÍPODAS ---
         // Coordenadas [longitud, latitud]
@@ -150,14 +154,26 @@
         // --- 5. CARGA DE DATOS Y EJECUCIÓN ---
         d3.json(worldUrl).then(world => {
             
+            let timer; // Variable para controlar la animación
             const land = topojson.feature(world, world.objects.land);
             let currentRotation = projection.rotate();
             
             const redraw = () => drawGlobe(land);
             
+            // Función para iniciar la rotación automática
+            function startRotation() {
+                timer = d3.timer(elapsed => {
+                    const rotate = projection.rotate();
+                    const speed = 0.015; // Velocidad de rotación
+                    projection.rotate([rotate[0] + speed * 10, rotate[1], rotate[2]]);
+                    redraw();
+                });
+            }
+
             // --- 6. INTERACTIVIDAD: ARRASTRAR EL GLOBO ---
             d3.select(context.canvas).call(d3.drag()
                 .on("start", (event) => {
+                    if (timer) timer.stop(); // Detiene la rotación automática al arrastrar
                     currentRotation = projection.rotate(); // Guarda la rotación actual
                 })
                 .on("drag", (event) => {
@@ -192,8 +208,8 @@
                 tooltip.style("opacity", 0);
             });
 
-            // Dibujo inicial
-            redraw();
+            // Iniciar la rotación automática
+            startRotation();
 
         }).catch(error => {
             console.error("Error al cargar los datos del mapa:", error);

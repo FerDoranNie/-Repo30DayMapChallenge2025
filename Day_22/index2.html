@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Observatorios > 3000m (D3.js)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CORRECCIÓN: Usamos cdnjs para mayor estabilidad -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Fondo oscuro espacial */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-weight: 300;
+            color: #ee8a65;
+            margin-top: 20px;
+        }
+        p {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+        canvas {
+            background-color: #000; /* Fondo del espacio */
+            /* border-radius: 50%; Quitado para que se vea el espacio cuadrado */
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Observatorios Astronómicos de Gran Altura</h1>
+    <p>Arrastra el globo para explorar. Mostrando sitios > 3000 msnm.</p>
+
+    <canvas id="globeCanvas" width="800" height="800"></canvas>
+
+    <script>
+        // --- 1. DATOS DE OBSERVATORIOS ---
+        // Convertidos de tu CSV
+        const observatorios = [
+            { nombre: "Observatorio de Atacama", sitio: "Cerro Chajnantor, Chile", lat: -22.986667, lon: -67.742222, altura: 5640 },
+            { nombre: "Obs. Chacaltaya", sitio: "Chacaltaya, Bolivia", lat: -16.353333, lon: -68.131389, altura: 5230 },
+            { nombre: "Obs. James Ax", sitio: "Cerro Toco, Chile", lat: -22.958333, lon: -67.786111, altura: 5200 },
+            { nombre: "Telescopio Atacama", sitio: "Desierto de Atacama, Chile", lat: 22.958611, lon: -67.787778, altura: 5190 },
+            { nombre: "Obs. Llano de Chajnator", sitio: "Llano de Chajnantor, Chile", lat: -23.022778, lon: -67.754722, altura: 5104 },
+            { nombre: "Obs. Shiquanhe", sitio: "Shiquanhe, China", lat: 32.325278, lon: 80.026667, altura: 5100 },
+            { nombre: "Gran obs. milimétrico (LLAMA)", sitio: "Puna de Atacama, Argentina", lat: -24.191944, lon: -66.474722, altura: 4825 }, 
+            { nombre: "Obs. Chajnantor", sitio: "Llano de Chajnantor, Chile", lat: -22.971389, lon: -67.702778, altura: 4800 },
+            { nombre: "GTM Alfonso Serrano", sitio: "Puebla, México", lat: 18.985, lon: -97.314, altura: 4580 },
+            { nombre: "Obs. Indio", sitio: "Hanle, India", lat: 32.779444, lon: 78.964167, altura: 4500 },
+            { nombre: "Obs. Meyer Womble", sitio: "Colorado, USA", lat: 39.586667, lon: -105.64, altura: 4312 },
+            { nombre: "Obs. Yangbajing", sitio: "Yangbajain, China", lat: 30.083333, lon: 90.55, altura: 4300 },
+            { nombre: "Obs. Mauna Kea", sitio: "Mauna Kea, Hawaii", lat: 19.824444, lon: -155.473333, altura: 4190 },
+            { nombre: "Obs. Cherenkov", sitio: "Sierra Negra, México", lat: 18.994444, lon: -97.309167, altura: 4100 },
+            { nombre: "Obs. Barcroft", sitio: "California, USA", lat: 37.588611, lon: -118.241944, altura: 3890 },
+            { nombre: "VLBA", sitio: "Mauna Kea, Hawaii", lat: 19.801389, lon: -155.455556, altura: 3730 },
+            { nombre: "Obs. Llano del Hato", sitio: "Llano del Hato, Venezuela", lat: 8.786389, lon: -70.871944, altura: 3600 },
+            { nombre: "Gran obs. Iraní", sitio: "Isfahan, Irán", lat: 33.674167, lon: 51.318611, altura: 3600 },
+            { nombre: "Obs. Sphinxs", sitio: "Alpes, Suiza", lat: 46.5475, lon: 7.985, altura: 3571 }
+        ];
+
+        // --- 2. CONFIGURACIÓN D3 ---
+        const canvas = document.getElementById('globeCanvas');
+        const context = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // URL del mapa del mundo (Usamos cdnjs que sabemos que funciona)
+        const worldUrl = "https://cdnjs.cloudflare.com/ajax/libs/world-atlas/2.0.2/land-50m.json";
+
+        // Proyección Ortográfica (Globo)
+        const projection = d3.geoOrthographic()
+            .scale(300) // Tamaño del globo
+            .translate([width / 2, height / 2])
+            .clipAngle(90); // Ocultar cara trasera
+
+        const pathGenerator = d3.geoPath(projection, context);
+
+        const sphere = {type: "Sphere"};
+        const graticule = d3.geoGraticule10();
+
+        // --- 3. DIBUJO DEL ÍCONO (TELESCOPIO) ---
+        // Función para dibujar un ícono de telescopio en canvas en una posición x,y
+        function drawTelescopeIcon(ctx, x, y, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            ctx.fillStyle = "#ee8a65"; // Color naranja para destacar
+
+            // 1. Trípode (patas)
+            ctx.beginPath();
+            ctx.moveTo(-6, 10);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(6, 10);
+            ctx.stroke();
+
+            // 2. Tubo del telescopio (rectángulo inclinado)
+            ctx.save();
+            ctx.rotate(-Math.PI / 4); // Inclinado 45 grados mirando arriba-izq
+            
+            // Cuerpo del tubo
+            ctx.fillStyle = "#ee8a65";
+            ctx.fillRect(-4, -10, 8, 20);
+            ctx.strokeRect(-4, -10, 8, 20);
+            
+            // Lente (parte superior)
+            ctx.fillStyle = "#add8e6"; // Azul vidrio
+            ctx.beginPath();
+            ctx.ellipse(0, -10, 4, 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+
+            // 3. Punto base
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- 4. FUNCIÓN PRINCIPAL DE DIBUJO ---
+        function drawGlobe(land) {
+            context.clearRect(0, 0, width, height);
+
+            // A. Espacio (Fondo negro ya está en CSS, pero limpiamos)
+            
+            // B. Océano (Esfera)
+            context.beginPath();
+            pathGenerator(sphere);
+            context.fillStyle = "#111"; // Océano oscuro
+            context.fill();
+            context.strokeStyle = "#333";
+            context.stroke();
+
+            // C. Retícula
+            context.beginPath();
+            pathGenerator(graticule);
+            context.strokeStyle = "#222";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // D. Tierra (Continentes)
+            context.beginPath();
+            pathGenerator(land);
+            context.fillStyle = "#333"; // Tierra gris oscuro
+            context.fill();
+            context.strokeStyle = "#444";
+            context.stroke();
+
+            // E. Observatorios
+            observatorios.forEach(obs => {
+                // 1. Proyectar coordenadas
+                const coords = [obs.lon, obs.lat];
+                const center = projection.invert([width/2, height/2]);
+                const distance = d3.geoDistance(coords, center);
+                
+                // Solo dibujar si está en la cara visible (distancia < 90 grados aprox 1.57 rad)
+                if (distance < 1.57) {
+                    const [x, y] = projection(coords);
+
+                    // 2. Dibujar Ícono
+                    drawTelescopeIcon(context, x, y - 10, 1.5); // Offset -10 para ponerlo "encima" del punto geográfico
+
+                    // 3. Dibujar Etiquetas
+                    context.fillStyle = "#fff";
+                    context.font = "bold 12px sans-serif";
+                    context.textAlign = "center";
+                    context.shadowColor = "black";
+                    context.shadowBlur = 4;
+                    
+                    // Sitio
+                    context.fillText(obs.sitio, x, y - 35);
+                    
+                    // Altura
+                    context.fillStyle = "#ee8a65"; // Naranja
+                    context.font = "italic 11px sans-serif";
+                    context.fillText(`${obs.altura} m`, x, y - 22);
+                    
+                    // Resetear sombra
+                    context.shadowBlur = 0;
+                }
+            });
+        }
+
+        // --- 5. INICIALIZACIÓN ---
+        d3.json(worldUrl).then(world => {
+            const land = topojson.feature(world, world.objects.land);
+            let currentRotation = projection.rotate();
+            
+            const redraw = () => drawGlobe(land);
+
+            // Interacción: Arrastrar para rotar
+            d3.select(canvas).call(d3.drag()
+                .on("start", (event) => {
+                    currentRotation = projection.rotate();
+                })
+                .on("drag", (event) => {
+                    const sensitivity = 0.25;
+                    const [yaw, pitch] = currentRotation;
+                    projection.rotate([yaw + event.dx * sensitivity, pitch - event.dy * sensitivity]);
+                    redraw();
+                }));
+
+            // Rotación automática suave inicial
+            d3.timer((elapsed) => {
+                // Si el usuario no está interactuando (podríamos añadir flag), rotar lento
+                // Por ahora lo dejamos estático tras la carga o manual
+            });
+            
+            // Dibujar primera vez
+            redraw();
+
+            // Animación inicial: rotar hacia América
+            d3.transition()
+                .duration(2000)
+                .tween("rotate", () => {
+                    const r = d3.interpolate(projection.rotate(), [100, -20]); // Mirar hacia América/Pacífico
+                    return (t) => {
+                        projection.rotate(r(t));
+                        redraw();
+                    };
+                });
+
+        }).catch(err => {
+            console.error(err);
+            document.body.innerHTML += "<h3 style='color:red'>Error al cargar el mapa base.</h3>";
+        });
+
+    </script>
+</body>
+</html>

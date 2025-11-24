@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Observatorios > 3000m (D3.js)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #050505; /* Fondo casi negro */
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden; /* Evitar barras de scroll por el canvas */
+        }
+        h1 {
+            font-weight: 300;
+            color: #ee8a65;
+            text-align: center;
+            max-width: 90%;
+            z-index: 10;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        canvas {
+            background-color: #000;
+            cursor: move; /* Cursor de mano */
+            position: absolute; /* Para que ocupe toda la pantalla detrás del texto */
+            top: 0;
+            left: 0;
+        }
+        #status {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 5px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- NUEVO ESTILO PARA LA CAJA DE LEYENDA --- */
+        #info-box {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(10, 10, 10, 0.7); /* Fondo semitransparente */
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px 20px;
+            z-index: 10;
+            max-width: 300px;
+            backdrop-filter: blur(4px); /* Efecto "frosty" para navegadores modernos */
+        }
+
+        #info-box h2, #info-box h3 {
+            font-weight: 300;
+            color: #ee8a65;
+            margin: 0 0 8px 0; /* Quitamos margen superior y añadimos inferior */
+            text-align: left; /* Alineamos a la izquierda dentro de la caja */
+            text-shadow: none; /* La caja ya tiene fondo, no necesita sombra de texto */
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Observatorios Astronómicos de Gran Altura</h1>
+    
+    <p>Arrastra para rotar. Usa la rueda del ratón para hacer <strong>ZOOM</strong>.</p>
+    <div id="status">Cargando mapa base...</div>
+
+    <canvas id="globeCanvas"></canvas>
+
+    <!-- Caja de Leyenda con el H2 y H3 -->
+    <div id="info-box">
+        <h2>#30DayMapChallenge 2025 - Día 22</h2>
+        <h3>Autor: Fernando Dorantes Nieto<br>Fuente: Wikipedia</h3>
+    </div>
+
+    <script>
+        // --- 1. DATOS DE OBSERVATORIOS ---
+        const observatorios = [
+            { nombre: "Observatorio de Atacama", sitio: "Cerro Chajnantor, Chile", lat: -22.986667, lon: -67.742222, altura: 5640 },
+            { nombre: "Obs. Chacaltaya", sitio: "Chacaltaya, Bolivia", lat: -16.349013166816242, lon:  -68.13074935268938, altura: 5230 },
+            { nombre: "Obs. James Ax", sitio: "Cerro Toco, Chile", lat: -22.958333, lon: -67.786111, altura: 5200 },
+            { nombre: "Obs. Llano de Chajnator", sitio: "Llano de Chajnantor, Chile", lat: -23.022778, lon: -67.754722, altura: 5104 },
+            { nombre: "Obs. Shiquanhe", sitio: "Shiquanhe, China", lat: 32.325278, lon: 80.026667, altura: 5100 },
+            { nombre: "Gran obs. milimétrico (LLAMA)", sitio: "Puna de Atacama, Argentina", lat: -24.191944, lon: -66.474722, altura: 4825 }, 
+            { nombre: "Obs. Chajnantor", sitio: "Llano de Chajnantor, Chile", lat: -22.971389, lon: -67.702778, altura: 4800 },
+            { nombre: "GTM Alfonso Serrano", sitio: "Sierra Negra, Puebla, México", lat: 18.985, lon: -97.314, altura: 4580 },
+            { nombre: "Obs. Indio", sitio: "Hanle, India", lat: 32.779444, lon: 78.964167, altura: 4500 },
+            { nombre: "Obs. Meyer Womble", sitio: "Colorado, USA", lat: 39.586667, lon: -105.64, altura: 4312 },
+            { nombre: "Obs. Yangbajing", sitio: "Yangbajain, China", lat: 30.083333, lon: 90.55, altura: 4300 },
+            { nombre: "Obs. Mauna Kea", sitio: "Mauna Kea, Hawaii", lat: 19.824444, lon: -155.473333, altura: 4190 },
+            { nombre: "Obs. Barcroft", sitio: "California, USA", lat: 37.588611, lon: -118.241944, altura: 3890 },
+            { nombre: "VLBA", sitio: "Mauna Kea, Hawaii", lat: 19.801389, lon: -155.455556, altura: 3730 },
+            { nombre: "Obs. Llano del Hato", sitio: "Llano del Hato, Venezuela", lat: 8.786389, lon: -70.871944, altura: 3600 },
+            { nombre: "Gran obs. Iraní", sitio: "Isfahan, Irán", lat: 33.674167, lon: 51.318611, altura: 3600 },
+            { nombre: "Obs. Sphinxs", sitio: "Alpes, Suiza", lat: 46.5475, lon: 7.985, altura: 3571 }
+        ];
+
+        // --- 2. CONFIGURACIÓN D3 ---
+        const canvas = document.getElementById('globeCanvas');
+        const context = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const worldUrl = "https://unpkg.com/world-atlas@2.0.2/land-110m.json";
+
+        let initialScale = Math.min(width, height) / 2.5;
+        
+        const projection = d3.geoOrthographic()
+            .scale(initialScale) 
+            .translate([width / 2, height / 2])
+            .clipAngle(90); 
+
+        const pathGenerator = d3.geoPath(projection, context);
+        const sphere = {type: "Sphere"};
+        const graticule = d3.geoGraticule10();
+
+        // --- 3. GENERACIÓN DE ESTRELLAS ---
+        const stars = [];
+        const numStars = 600;
+
+        function generateStars() {
+            stars.length = 0;
+            for(let i=0; i<numStars; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 1.5,
+                    alpha: Math.random() * 0.8 + 0.2
+                });
+            }
+        }
+        generateStars();
+
+        // --- 4. DIBUJO DEL ÍCONO ---
+        function drawTelescopeIcon(ctx, x, y, scale = 1) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(-6, 10);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(6, 10);
+            ctx.stroke();
+
+            ctx.save();
+            ctx.rotate(-Math.PI / 4); 
+            ctx.fillStyle = "#FF5555";
+            ctx.fillRect(-4, -10, 8, 20);
+            ctx.strokeStyle = "#fff"; 
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-4, -10, 8, 20);
+            
+            ctx.fillStyle = "#1581BF"; 
+            ctx.beginPath();
+            ctx.ellipse(0, -10, 4, 1.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // --- 5. FUNCIÓN DE DIBUJO ---
+        function drawGlobe(land) {
+            context.clearRect(0, 0, width, height);
+
+            // A. Estrellas
+            stars.forEach(star => {
+                context.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                context.beginPath();
+                context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                context.fill();
+            });
+
+            // B. Océano
+            context.beginPath();
+            pathGenerator(sphere);
+            context.fillStyle = "#080808"; 
+            context.fill();
+            
+            context.lineWidth = 2;
+            context.strokeStyle = "rgba(100, 200, 255, 0.3)";
+            context.stroke();
+
+            // C. Retícula
+            context.beginPath();
+            pathGenerator(graticule);
+            context.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // D. Tierra
+            if (land) {
+                context.beginPath();
+                pathGenerator(land);
+                context.fillStyle = "#222"; 
+                context.fill();
+                context.strokeStyle = "#333";
+                context.lineWidth = 1;
+                context.stroke();
+            }
+
+            // E. Observatorios
+            observatorios.forEach(obs => {
+                const coords = [obs.lon, obs.lat];
+                const center = projection.invert([width/2, height/2]);
+                const distance = d3.geoDistance(coords, center);
+                
+                if (distance < 1.57) {
+                    const [x, y] = projection(coords);
+
+                    const currentScale = projection.scale();
+                    const iconScale = Math.max(0.8, currentScale / 300);
+
+                    drawTelescopeIcon(context, x, y - (10 * iconScale), iconScale * 1.5); 
+
+                    context.fillStyle = "#fff";
+                    const fontSize = Math.max(10, Math.min(16, currentScale / 25));
+                    context.font = `bold ${fontSize}px sans-serif`;
+                    context.textAlign = "center";
+                    context.shadowColor = "black";
+                    context.shadowBlur = 4;
+                    context.shadowOffsetX = 2;
+                    context.shadowOffsetY = 2;
+                    
+                    const textOffset = 35 * iconScale;
+                    context.fillText(obs.sitio, x, y - textOffset);
+                    
+                    context.fillStyle = "#ee8a65"; 
+                    context.font = `italic ${fontSize - 1}px sans-serif`;
+                    context.fillText(`${obs.altura} m`, x, y - (textOffset - (13 * iconScale)));
+                    
+                    context.shadowBlur = 0;
+                    context.shadowOffsetX = 0;
+                    context.shadowOffsetY = 0;
+                }
+            });
+        }
+
+        // --- 6. INICIALIZACIÓN ---
+        async function init() {
+            let land = null;
+
+            try {
+                const world = await d3.json(worldUrl);
+                land = topojson.feature(world, world.objects.land);
+                statusDiv.innerText = "Mapa cargado correctamente.";
+                statusDiv.style.color = "#4CAF50";
+                setTimeout(() => { statusDiv.style.opacity = 0; }, 3000); 
+            } catch (err) {
+                console.warn("No se pudo cargar el mapa de tierra.", err);
+                statusDiv.innerText = "Modo Offline (Solo Observatorios).";
+                statusDiv.style.color = "#FFC107";
+            }
+
+            const redraw = () => drawGlobe(land);
+
+            // --- INTERACCIONES ARREGLADAS ---
+            
+            // 1. Comportamiento de ZOOM
+            const zoomBehavior = d3.zoom()
+                .scaleExtent([150, 4000])
+                .on("zoom", (event) => {
+                    // Detener animación
+                    d3.select(canvas).interrupt();
+                    
+                    // Actualizar solo la escala
+                    projection.scale(event.transform.k);
+                    redraw();
+                });
+
+            // 2. Comportamiento de DRAG
+            const dragBehavior = d3.drag()
+                .subject(() => {
+                    // Necesario para que d3 sepa "dónde" empieza el drag
+                    const r = projection.rotate();
+                    return {x: r[0], y: -r[1]};
+                })
+                .on("start", () => {
+                    d3.select(canvas).interrupt(); // Detener animación
+                })
+                .on("drag", (event) => {
+                    // Calcular la nueva rotación basada en el movimiento del mouse
+                    // Ajustar sensibilidad según el zoom actual para que no sea muy rápido al estar cerca
+                    const k = projection.scale() / initialScale;
+                    const sensitivity = 0.25 / k;
+                    
+                    const rotate = projection.rotate();
+                    projection.rotate([
+                        rotate[0] + event.dx * sensitivity,
+                        rotate[1] - event.dy * sensitivity
+                    ]);
+                    redraw();
+                });
+
+            // Aplicar al canvas
+            // El truco es que el zoom controle el canvas, pero el drag capture el evento primero
+            d3.select(canvas)
+                .call(dragBehavior)
+                .call(zoomBehavior)
+                .on("wheel", (event) => {
+                    // D3 Zoom usa wheel automáticamente, pero nos aseguramos de parar la animación
+                    d3.select(canvas).interrupt();
+                });
+
+            // Setear zoom inicial para sincronizar el estado interno de d3.zoom
+            d3.select(canvas).call(zoomBehavior.transform, d3.zoomIdentity.scale(initialScale));
+
+
+            // Resize
+            window.addEventListener('resize', () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                projection.translate([width / 2, height / 2]);
+                generateStars();
+                redraw();
+            });
+
+            // Animación Inicial
+            redraw();
+            d3.transition()
+                .duration(2500)
+                .tween("rotate", () => {
+                    const r = d3.interpolate(projection.rotate(), [100, -20]); 
+                    return (t) => {
+                        projection.rotate(r(t));
+                        redraw();
+                    };
+                });
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
