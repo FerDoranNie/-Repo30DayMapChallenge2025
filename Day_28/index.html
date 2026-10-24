@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Dinosaurios: Registros</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Librerías D3 y TopoJSON -->
+    <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50; /* Fondo oscuro elegante */
+            color: #ecf0f1;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+
+        #canvas-container {
+            position: relative;
+            margin-top: 20px;
+            /* box-shadow removido para que no interfiera visualmente con el zoom */
+        }
+
+        canvas {
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        /* Tooltip flotante */
+        #tooltip {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            max-width: 200px;
+            z-index: 10;
+        }
+        
+        #tooltip h3 { margin: 0 0 5px 0; font-size: 1rem; color: #e74c3c; }
+        #tooltip span { font-weight: bold; color: #2980b9; }
+
+        .leyenda {
+            margin-top: 15px;
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 10;
+        }
+        .item-leyenda { display: flex; align-items: center; gap: 8px; }
+        
+        .instrucciones {
+            font-size: 0.8rem;
+            color: #bdc3c7;
+            margin-top: 10px;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1> ¿Dónde se han encontrado fósiles de dinosaurios? </h1>
+    <h2> #30DayMapChallenge; Día 28; Autor: Fernando Dorantes Nieto </h2>
+    <h2> Fuente: Paleobiology Database, 2025 </h2>    
+    <div class="leyenda">
+        <div class="item-leyenda">
+            <img id="leyenda-saurischia" src="./Saurischia.svg" style="width: 20px; height: 20px;"> Saurischia (Ejemplo: T-Rex)
+        </div>
+        <div class="item-leyenda">
+            <img id="leyenda-ornithischia" src="./Ornithischia.svg" style="width: 20px; height: 20px;"> Ornithischia (Ejemplo: Triceratops)
+        </div>
+    </div>
+    
+    <div class="instrucciones">Arrastra para rotar • Usa la rueda del ratón para hacer zoom</div>
+
+    <div id="canvas-container">
+        <canvas id="globe" width="800" height="800"></canvas>
+        <div id="tooltip"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. CONFIGURACIÓN DE USUARIO (EDITAR AQUÍ)
+        // ==========================================
+        
+        const COLORS = {
+            saurischia: "#FF5555",
+            ornithischia: "#C1E59F"
+        };
+
+        const ICON_URLS = {
+            "ornithischia": './Ornithischia.svg',
+            "saurischia": './Saurischia.svg'
+            //"Saurischia": "https://img.icons8.com/color/48/dinosaur.png",   
+            //"Ornithischia": "https://img.icons8.com/color/48/triceratops.png" 
+        };
+
+        // ==========================================
+        // 2. INICIALIZACIÓN DEL MAPA
+        // ==========================================
+
+        let dinosaurios = []; // La llenaremos desde el CSV
+        const canvas = document.getElementById('globe');
+        const context = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Escala base
+        const initialScale = 380;
+
+        // Proyección Ortográfica
+        const projection = d3.geoOrthographic()
+            .scale(initialScale)
+            .translate([width / 2, height / 2])
+            .clipAngle(90);
+
+        const path = d3.geoPath(projection, context);
+
+        let land;
+        let images = {}; 
+        
+        let legendImages = {};
+
+        // Cargar recursos
+        Promise.all([
+            d3.json("https://unpkg.com/world-atlas@2.0.2/land-110m.json"),
+            d3.csv("Datos_dinosaurios_paleobiodb.csv"),
+            cargarImagen(ICON_URLS["saurischia"]),
+            cargarImagen(ICON_URLS["ornithischia"])
+        ]).then(async ([worldData, dinoData, imgSaur, imgOrni]) => {
+            
+            land = topojson.feature(worldData, worldData.objects.land);
+            images["saurischia"] = await colorizeImage(imgSaur, COLORS.saurischia);
+            images["ornithischia"] = await colorizeImage(imgOrni, COLORS.ornithischia);
+            
+            legendImages["saurischia"] = await colorizeImage(imgSaur, COLORS.saurischia, false);
+            legendImages["ornithischia"] = await colorizeImage(imgOrni, COLORS.ornithischia, false);
+
+            // Procesamos los datos del CSV.
+            // Hay que convertir lat y lon a números.
+            dinosaurios = dinoData.map(d => ({
+                ...d, // Copia todas las columnas del CSV (tipo, nombre, etc.)
+                tipo: d.tipo.toLowerCase(), // Normalizamos el tipo a minúsculas
+                lat: +d.lat, // El '+' convierte el string a número
+                lon: +d.lon  // El '+' convierte el string a número
+            }));
+
+            render();
+            actualizarLeyenda();
+            initInteraction(); // Aquí configuramos zoom y drag
+
+        }).catch(err => console.error("Error cargando recursos:", err));
+
+        function cargarImagen(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = url;
+            });
+        }
+
+        function colorizeImage(img, color, withBorder = true) {
+            return new Promise((resolve) => {
+                if (!img) { resolve(null); return; }
+
+                const BORDER_SIZE = withBorder ? 2 : 0;
+                const offscreenCanvas = document.createElement('canvas');
+                const offscreenCtx = offscreenCanvas.getContext('2d');
+                offscreenCanvas.width = img.width + BORDER_SIZE * 2;
+                offscreenCanvas.height = img.height + BORDER_SIZE * 2;
+
+                if (withBorder) {
+                    // 1. Dibuja el contorno negro
+                    offscreenCtx.drawImage(img, BORDER_SIZE, BORDER_SIZE);
+                    offscreenCtx.globalCompositeOperation = 'source-in';
+                    offscreenCtx.fillStyle = 'black';
+                    offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+                }
+
+                // 2. Dibuja el relleno de color
+                offscreenCtx.drawImage(img, BORDER_SIZE, BORDER_SIZE);
+                offscreenCtx.globalCompositeOperation = 'source-in';
+                offscreenCtx.fillStyle = color;
+                offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+                resolve(offscreenCanvas);
+            });
+        }
+
+        // ==========================================
+        // 3. ACTUALIZACIÓN DE LA LEYENDA
+        // ==========================================
+        function actualizarLeyenda() {
+            // Usamos los canvas coloreados (sin borde) que pre-generamos
+            document.getElementById('leyenda-saurischia').src = legendImages.saurischia.toDataURL();
+            document.getElementById('leyenda-ornithischia').src = legendImages.ornithischia.toDataURL();
+        }
+
+        // ==========================================
+        // 4. FUNCIÓN DE DIBUJADO (RENDER)
+        // ==========================================
+
+        function render() {
+            context.clearRect(0, 0, width, height);
+
+            // 1. Océano
+            context.beginPath();
+            path({type: "Sphere"});
+            context.fillStyle = "#34495e";
+            context.fill();
+            
+            // 2. Atmósfera
+            const r = projection.scale();
+            const gradient = context.createRadialGradient(
+                width/2 - r*0.3, height/2 - r*0.3, r*0.2, 
+                width/2, height/2, r*1.1
+            );
+            gradient.addColorStop(0, "rgba(255,255,255,0.1)");
+            gradient.addColorStop(1, "rgba(0,0,0,0.4)");
+            context.fillStyle = gradient;
+            context.beginPath();
+            // Dibujamos un círculo del tamaño actual de la proyección
+            context.arc(width/2, height/2, r, 0, 2 * Math.PI);
+            context.fill();
+
+            // 3. Continentes
+            if (land) {
+                context.beginPath();
+                path(land);
+                context.fillStyle = "#95a5a6";
+                context.fill();
+                context.strokeStyle = "#7f8c8d";
+                context.lineWidth = 0.5;
+                context.stroke();
+            }
+
+            // 4. Retícula
+            context.beginPath();
+            path(d3.geoGraticule10());
+            context.strokeStyle = "rgba(255, 255, 255, 0.05)";
+            context.lineWidth = 0.5;
+            context.stroke();
+
+            // 5. Dibujar Íconos
+            dinosaurios.forEach(dino => {
+                const coords = [dino.lon, dino.lat];
+                const center = projection.invert([width/2, height/2]);
+                const distance = d3.geoDistance(coords, center);
+
+                if (distance < 1.57) {
+                    const [x, y] = projection(coords);
+                    const img = images[dino.tipo]; // dino.tipo ahora es "saurischia" o "ornithischia"
+
+                    // Escalar ícono según el zoom
+                    const currentScale = projection.scale();
+                    // Tamaño base 20px, ajustado por factor de zoom
+                    const iconSize = Math.max(10, (currentScale / initialScale) * 20);
+
+                    if (img) {
+                        context.drawImage(img, x - iconSize/2, y - iconSize/2, iconSize, iconSize);
+                    } else {
+                        context.beginPath();
+                        context.arc(x, y, iconSize / 5, 0, 2 * Math.PI);
+                        context.fillStyle = dino.tipo === "saurischia" ? COLORS.saurischia : COLORS.ornithischia;
+                        context.fill();
+                        context.strokeStyle = "rgba(0,0,0,0.5)";
+                        context.stroke(); // Aplicar borde en ambos casos para consistencia
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 4. INTERACTIVIDAD (ZOOM + DRAG)
+        // ========================================== (Renumerado a 5)
+
+        function initInteraction() {
+            const canvasSel = d3.select(canvas);
+
+            // A. Comportamiento de ZOOM
+            const zoomBehavior = d3.zoom()
+                .scaleExtent([200, 2000]) // Límites: Min 200px, Max 2000px de radio
+                .on("zoom", (event) => {
+                    // El evento de zoom nos da el factor de escala 'k'
+                    // Pero d3.zoom piensa en términos de transformación de matriz.
+                    // Para un globo, es mejor usar event.transform.k como la escala de proyección directa.
+                    
+                    // Actualizamos la escala de la proyección
+                    projection.scale(event.transform.k);
+                    render();
+                });
+
+            // B. Comportamiento de DRAG (Rotación)
+            const dragBehavior = d3.drag()
+                .on("drag", (event) => {
+                    const rotate = projection.rotate();
+                    // Ajustar sensibilidad: cuanto más zoom, más lento debe rotar
+                    const k = 75 / projection.scale(); 
+                    projection.rotate([
+                        rotate[0] + event.dx * k,
+                        rotate[1] - event.dy * k
+                    ]);
+                    render();
+                });
+
+            // Aplicamos ambos al canvas
+            canvasSel
+                .call(dragBehavior)
+                .call(zoomBehavior)
+                // IMPORTANTE: Sincronizar el estado inicial del zoom
+                .call(zoomBehavior.transform, d3.zoomIdentity.scale(initialScale));
+
+            
+            // C. Tooltip
+            canvasSel.on("mousemove", (event) => {
+                // ... (Lógica de tooltip igual que antes, pero ajustada al nuevo render)
+                // Nota: La lógica inversa projection.invert funciona automáticamente con la nueva escala
+                
+                const [mx, my] = d3.pointer(event);
+                const mouseCoords = projection.invert([mx, my]);
+                let closest = null;
+                let minDist = Infinity;
+                
+                // Umbral visual constante en píxeles (ej. 20px) convertido a grados según zoom
+                // Aprox: 20px / radio * (180/PI)
+                const currentScale = projection.scale();
+                const thresholdDeg = (20 / currentScale) * (180 / Math.PI); 
+
+                dinosaurios.forEach(dino => {
+                    const dinoCoords = [dino.lon, dino.lat];
+                    const center = projection.invert([width/2, height/2]);
+                    
+                    if (d3.geoDistance(dinoCoords, center) < 1.57) {
+                        const dist = d3.geoDistance(dinoCoords, mouseCoords) * (180 / Math.PI);
+                        if (dist < minDist && dist < thresholdDeg) {
+                            minDist = dist;
+                            closest = dino;
+                        }
+                    }
+                });
+
+                if (closest) {
+                    tooltip.style.opacity = 1;
+                    tooltip.style.left = (event.pageX + 15) + "px";
+                    tooltip.style.top = (event.pageY - 15) + "px";
+                    tooltip.innerHTML = `
+                        <h3>${closest.nombre}</h3>
+                        <div>Tipo: <span>${closest.tipo}</span></div>
+                        <div>Periodo: ${closest.periodo}</div>
+                    `;
+                    canvas.style.cursor = "pointer";
+                } else {
+                    tooltip.style.opacity = 0;
+                    canvas.style.cursor = "grab";
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

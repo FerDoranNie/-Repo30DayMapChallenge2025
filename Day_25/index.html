@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>¿Cuántos Méxicos caben hasta la Luna?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            cursor: move;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            font-weight: 300;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            margin: 0;
+            font-size: 2rem;
+        }
+        h2 {
+            font-weight: 300;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            margin: 0;
+            font-size: 2rem;
+        }
+
+
+
+        #subtitle {
+            font-size: 1.5rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        #instructions {
+            font-size: 0.9rem;
+            color: #ee8a65;
+            margin-top: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        #counter {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8rem;
+            font-weight: bold;
+            color: #ee8a65;
+            opacity: 0;
+            transition: opacity 1s;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            z-index: 20;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        #final-text {
+            font-size: 1.5rem;
+            color: #fff;
+            display: block;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        #start-button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        #startButton {
+            background-color: #ee8a65;
+            color: #050505;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        #startButton:hover {
+            background-color: #ffac8e;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <div id="overlay">
+            <h1>¿Cuántos Méxicos se necesitan para llegar hasta la Luna?</h1>
+            <h2>#30DayMapChallenge Día 25</h2>
+            <h2>Autor: Fernando Dorantes Nieto</h2>
+            
+            <div id="subtitle">Distancia hasta la Luna: 384,400 km (Wikipedia, 2025) | Longitud México (Tijuana-Cancún): 3,280 km</div>
+            <div id="instructions">Usa la rueda del ratón para hacer ZOOM y arrastra para moverte</div>
+        </div>
+        <div id="start-button-container">
+            <button id="startButton">Iniciar Animación</button>
+        </div>
+        <div id="counter">
+            <span id="count-val">0</span>
+            <span id="final-text">Méxicos</span>
+        </div>
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const counterEl = document.getElementById('counter');
+        const countValEl = document.getElementById('count-val');
+        const startButton = document.getElementById('startButton');
+
+        let width, height;
+        
+        // Datos ACTUALIZADOS
+        // 384,400 / 3,280 = 117.195
+        const TOTAL_MEXICOS = 117;
+        
+        // Estado de Zoom/Pan
+        let transform = { k: 1, x: 0, y: 0 };
+
+        // Geo
+        const worldUrl = "https://unpkg.com/world-atlas@2.0.2/land-110m.json";
+        let land = null; 
+        let mexicoGeo = null;
+        let mexicoPath2D = null; 
+
+        // Estado Animación
+        let currentMexicos = 0;
+        let animationFrameId;
+
+        // Estrellas
+        const stars = [];
+
+        // --- INICIALIZACIÓN ---
+        async function init() {
+            resize();
+            window.addEventListener('resize', resize);
+            startButton.addEventListener('click', startAnimation);
+            generateStars();
+
+            // Configurar D3 Zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 50]) // Aumenté el zoom máximo para ver detalles
+                .on("zoom", (e) => {
+                    transform = e.transform;
+                });
+
+            d3.select(canvas).call(zoom);
+
+            try {
+                // 1. Cargar Mapa Mundial Completo
+                const world = await d3.json(worldUrl);
+                land = topojson.feature(world, world.objects.land);
+
+                // 2. Cargar Geometría de México
+                const mxUrl = "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"; 
+                const worldGeo = await d3.json(mxUrl);
+                mexicoGeo = worldGeo.features.find(f => f.id === "MEX" || f.properties.name === "Mexico");
+
+                if (mexicoGeo) {
+                   preRenderMexico();
+                   drawInitialState(); // Dibujar estado inicial sin animar
+                } else {
+                    console.error("No se encontró la geometría de México");
+                }
+
+            } catch (e) {
+                console.error("Error cargando mapas", e);
+            }
+        }
+        
+        function drawInitialState() {
+            ctx.clearRect(0, 0, width, height);
+            drawSpace();
+            drawScene();
+        }
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            generateStars();
+        }
+
+        function generateStars() {
+            stars.length = 0;
+            for(let i=0; i<500; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 1.5,
+                    alpha: Math.random()
+                });
+            }
+        }
+
+        function preRenderMexico() {
+            // Caja base de alta resolución
+            const projection = d3.geoIdentity().reflectY(true);
+            const pathGen = d3.geoPath(projection);
+            
+            projection.fitSize([1000, 1000], mexicoGeo); 
+            
+            const pathData = pathGen(mexicoGeo);
+            mexicoPath2D = new Path2D(pathData);
+        }
+
+        // --- DIBUJADO ---
+
+        function drawSpace() {
+            ctx.fillStyle = "#050505";
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = "#ffffff";
+            stars.forEach(s => {
+                ctx.globalAlpha = s.alpha;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawScene() {
+            ctx.save();
+            ctx.translate(transform.x, transform.y);
+            ctx.scale(transform.k, transform.k);
+
+            const earth = drawEarth();
+            const moon = drawMoon();
+            drawMexicos(earth, moon);
+
+            ctx.restore();
+        }
+
+        function drawEarth() {
+            const earthRadius = Math.min(width, height) * 0.15;
+            const cx = width * 0.1; 
+            const cy = height * 0.8; 
+            
+            const grad = ctx.createRadialGradient(cx - earthRadius*0.3, cy - earthRadius*0.3, earthRadius*0.1, cx, cy, earthRadius);
+            grad.addColorStop(0, "#2b6cb0");
+            grad.addColorStop(1, "#0f2c4d");
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            if (land) {
+                ctx.save();
+                const earthProj = d3.geoOrthographic()
+                    .translate([cx, cy])
+                    .scale(earthRadius)
+                    .rotate([100, -20]) 
+                    .clipAngle(90);
+
+                const pathEarth = d3.geoPath(earthProj, ctx);
+
+                ctx.beginPath();
+                pathEarth(land);
+                ctx.fillStyle = "#38a169";
+                ctx.fill();
+                
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            const shadowGrad = ctx.createRadialGradient(cx + earthRadius*0.4, cy + earthRadius*0.4, earthRadius*0.5, cx, cy, earthRadius);
+            shadowGrad.addColorStop(0, "rgba(0,0,0,0)");
+            shadowGrad.addColorStop(0.8, "rgba(0,0,0,0.6)");
+            shadowGrad.addColorStop(1, "rgba(0,0,0,0.8)");
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
+            ctx.fillStyle = shadowGrad;
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(100, 200, 255, 0.4)";
+            ctx.lineWidth = 3 / transform.k; 
+            ctx.stroke();
+
+            return { x: cx, y: cy, r: earthRadius };
+        }
+
+        function drawMoon() {
+            const moonRadius = Math.min(width, height) * 0.08; 
+            const cx = width * 0.9; 
+            const cy = height * 0.2; 
+
+            const grad = ctx.createRadialGradient(cx - moonRadius*0.3, cy - moonRadius*0.3, moonRadius*0.1, cx, cy, moonRadius);
+            grad.addColorStop(0, "#eeeeee");
+            grad.addColorStop(1, "#888888");
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, moonRadius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            ctx.fillStyle = "rgba(0,0,0,0.1)";
+            ctx.beginPath(); ctx.arc(cx - 10, cy + 10, moonRadius/4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + 15, cy - 5, moonRadius/6, 0, Math.PI*2); ctx.fill();
+
+            return { x: cx, y: cy, r: moonRadius };
+        }
+
+        function drawMexicos(startPos, endPos) {
+            // Línea guía
+            ctx.beginPath();
+            ctx.moveTo(startPos.x, startPos.y);
+            ctx.lineTo(endPos.x, endPos.y);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 1 / transform.k;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const dx = endPos.x - startPos.x;
+            const dy = endPos.y - startPos.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const angle = Math.atan2(dy, dx);
+
+            const paddingStart = startPos.r + 20;
+            const paddingEnd = endPos.r + 20;
+            const usableDist = dist - paddingStart - paddingEnd;
+            const step = usableDist / TOTAL_MEXICOS;
+
+            for (let i = 0; i < currentMexicos; i++) {
+                const t = paddingStart + (i * step);
+                const px = startPos.x + Math.cos(angle) * t;
+                const py = startPos.y + Math.sin(angle) * t;
+
+                ctx.save();
+                ctx.translate(px, py);
+                
+                // Rotación corregida (-0.6 rad) para alinear la diagonal T-Y
+                ctx.rotate(angle - 0.6); 
+
+                // Escalado modificado para dejar espacio
+                // Antes: 1.6 (solapamiento) -> Ahora: 0.85 (espacio ligero)
+                const scale = (step / 1000) * 0.85; 
+                ctx.scale(scale, scale);
+                ctx.translate(-500, -500); 
+
+                const progress = i / TOTAL_MEXICOS;
+                if (progress < 0.3) ctx.fillStyle = "#009c3b"; 
+                else if (progress < 0.6) ctx.fillStyle = "#ffffff"; 
+                else ctx.fillStyle = "#ce1126"; 
+
+                if (i === Math.floor(currentMexicos) - 1) {
+                    ctx.shadowColor = "#fff";
+                    ctx.shadowBlur = 50; 
+                    ctx.fillStyle = "#ffff00";
+                }
+
+                ctx.fill(mexicoPath2D);
+                
+                ctx.shadowBlur = 0;
+                ctx.restore();
+            }
+        }
+
+        // --- ANIMACIÓN ---
+        function startAnimation() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            currentMexicos = 0;
+            counterEl.style.opacity = 0;
+            countValEl.innerText = '0';
+            startButton.blur(); // Quitar foco del botón
+
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            drawSpace();
+            drawScene();
+
+            if (currentMexicos < TOTAL_MEXICOS) {
+                // Velocidad logarítmica: lento al inicio, rápido al final
+                let speed = 0.2 + (currentMexicos / 40); 
+                currentMexicos += speed;
+                animationFrameId = requestAnimationFrame(animate);
+            } else {
+                currentMexicos = TOTAL_MEXICOS;
+                animationFrameId = requestAnimationFrame(animate); 
+                if (counterEl.style.opacity == 0) showResult();
+            }
+        }
+
+        function showResult() {
+            counterEl.style.opacity = 1;
+            const duration = 2000;
+            const startTime = performance.now();
+
+            function countAnim(time) {
+                let timeFraction = (time - startTime) / duration;
+                if (timeFraction > 1) timeFraction = 1;
+                const value = Math.floor(timeFraction * TOTAL_MEXICOS);
+                countValEl.innerText = value;
+                if (timeFraction < 1) requestAnimationFrame(countAnim);
+            }
+            requestAnimationFrame(countAnim);
+        }
+
+        init();
+
+    </script>
+</body>
+</html>

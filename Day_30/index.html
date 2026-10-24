@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recorrido de Sitios</title>
+    
+    <!-- CAMBIO: Usamos Leaflet en lugar de MapLibre para evitar errores de seguridad en este entorno -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        /* Estilo para el título H1 */
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 20%;
+            transform: translateX(-50%);
+            z-index: 1001; /* Por encima del mapa y controles */
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 2em;
+            color: #333;
+        }
+        h2 {
+            position: abosulute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1003; /* Por encima del mapa y controles */
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            font-size: 2em;
+            color: #333;
+        }
+
+
+        /* Estilo de los controles de navegación */
+        .map-overlay {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 1000; /* Leaflet usa z-index alto */
+            backdrop-filter: blur(5px);
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+        }
+
+        button:hover { background-color: #0056b3; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        button:disabled { 
+            background-color: #e0e0e0; 
+            color: #999; 
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #info-display {
+            font-weight: 700;
+            color: #333;
+            min-width: 100px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Estilo del Popup personalizado (Overrides de Leaflet) */
+        .leaflet-popup-content-wrapper {
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 20px;
+            max-width: 350px; /* Aumentamos el ancho máximo para mejor visualización */
+            font-family: 'Segoe UI', sans-serif;
+            border-left: 5px solid #007bff;
+        }
+        .popup-title { 
+            font-size: 3em; /* Ajustado para mejor legibilidad */
+            font-weight: 800; 
+            color: #2c3e50; 
+            margin-bottom: 8px; 
+            line-height: 1.2;
+        }
+        .popup-motivo { 
+            font-size: 2em; /* Ajustado para mejor legibilidad */
+            color: #555; 
+            line-height: 1.5;
+        }
+        .popup-label { 
+            font-weight: 700; 
+            color: #007bff;
+            text-transform: uppercase;
+            font-size: 0.75em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1> Sitios ultra favoritos de Fernando Dorantes Nieto <br> #30DayMapChallenge Día 30</h1>
+
+    <div id="map"></div>
+
+    <div class="map-overlay">
+        <button id="btn-prev" onclick="cambiarSitio(-1)">← Anterior</button>
+        <div id="info-display">Vista General</div>
+        <button id="btn-next" onclick="cambiarSitio(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        // ==============================================================
+        // 1. TUS DATOS AQUÍ
+        // ==============================================================
+        const datos = [
+            {
+                nombre: "Casa de Coahuila A. C., Coyoacán, CDMX",
+                motivo: "En este lugar conocí en Octubre 2022 a la mascota que más he querido en toda mi vida, la Toñis",
+                coords: [19.3561774180416, -99.1488549177124] // Leaflet usa [Lat, Lon] (Al revés que MapLibre)
+            },
+            {
+                nombre: "Mi primer avistamiento de aves, Puebla, Puebla",
+                motivo: "El sitio donde fue mi primera pajareada con mis amigos",
+                coords: [18.9413443009831, -98.1840873167072]
+            },
+            {
+                nombre: "Huehuetla, Puebla",
+                motivo: "El sitio donde tras una noche de captura de murciélagos y búsqueda de aves nocturnas, me sentí en más paz que nunca en mi vida por lo aprendido en esa gran noche",
+                coords: [20.1036036850754, -97.6182523633177]
+            },
+            {
+                nombre: "Cerro Cuthá, Zapotitlán Salinas, Puebla",
+                motivo: "Sitio donde vi un trogón y un búho por primera vez, me fui solo a buscarlos y valió totalmente la pena",
+                coords: [18.3379758240646, -97.4467553845719]
+            },
+            {
+                nombre: "Chichicaxtle, Veracruz",
+                motivo: "La primera vez que vi volando miles de aves rapaces migrando, fue uno de los días más felices de mi vida",
+                coords: [19.3438614976858, -96.4634528261272]
+            },
+            {
+                nombre: "Ejidos cafetaleros, Tapachula, Chiapas",
+                motivo: "La caminata más larga y la más tranquila en zona boscosa con una de las personas más especiales que estuvo en mi vida",
+                coords: [14.5968924431165, -92.2647966254005]
+            }
+
+        ];
+        // ==============================================================
+
+        let currentIndex = -1; // -1 representa la vista inicial general
+        let markers = []; // Array para guardar referencias a los marcadores
+
+        // Inicializar Mapa con Leaflet
+        const map = L.map('map', {
+            zoomControl: false // Lo movemos de lugar después
+        }).setView([23, -102], 5);
+
+        // CAMBIO DE CAPA: Usamos OpenTopoMap para resaltar zonas naturales
+        L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17, // OpenTopoMap soporta hasta zoom 17, lo ajustamos a su valor nativo.
+            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+        }).addTo(map);
+
+        // Añadir control de zoom arriba a la derecha
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(map);
+
+        // Crear marcadores
+        datos.forEach((sitio, index) => {
+            const marker = L.marker(sitio.coords).addTo(map);
+            
+            // Contenido del Popup
+            const popupContent = `
+                <span class="popup-label">Ubicación</span>
+                <div class="popup-title">${sitio.nombre}</div>
+                <span class="popup-label">Razón</span>
+                <div class="popup-motivo">${sitio.motivo}</div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                offset: [0, -20],
+                closeButton: true,
+                autoClose: false // Permitimos control manual
+            });
+
+            // Evento click en marcador
+            marker.on('click', () => {
+                irASitio(index);
+            });
+
+            markers.push(marker);
+        });
+
+        // Evento cuando termina la animación de vuelo
+        map.on('moveend', () => {
+            // Abrir el popup del sitio actual cuando termine el movimiento
+            // (Verificamos que el centro del mapa esté cerca del destino para no abrirlo si el usuario movió el mapa manualmente)
+            const target = datos[currentIndex].coords;
+            const current = map.getCenter();
+            const dist = Math.sqrt(Math.pow(target[0]-current.lat, 2) + Math.pow(target[1]-current.lng, 2));
+            
+            if (dist < 0.1) {
+                markers[currentIndex].openPopup();
+            }
+        });
+
+        // Funciones de control
+        function cambiarSitio(direccion) {
+            let newIndex = currentIndex + direccion;
+            if (newIndex < 0) newIndex = 0;
+            if (newIndex >= datos.length) newIndex = datos.length - 1;
+
+            if (newIndex !== currentIndex) {
+                irASitio(newIndex);
+            }
+        }
+
+        function irASitio(index) {
+            currentIndex = index;
+            const sitio = datos[index];
+
+            // Cerrar todos los popups antes de volar
+            map.closePopup();
+
+            // Animación de vuelo (FlyTo)
+            map.flyTo(sitio.coords, 14, {
+                animate: true,
+                duration: 6 // Reducimos la duración para una animación más rápida y fluida.
+            });
+
+            actualizarInterfaz();
+        }
+
+        function actualizarInterfaz() {
+            document.getElementById('info-display').innerText = currentIndex === -1 ? 'Vista General' : `Sitio ${currentIndex + 1}`;
+            document.getElementById('btn-prev').disabled = (currentIndex === 0);
+            document.getElementById('btn-next').disabled = (currentIndex === datos.length - 1);
+        }
+
+        // Iniciar interfaz
+        actualizarInterfaz();
+
+    </script>
+</body>
+</html>
